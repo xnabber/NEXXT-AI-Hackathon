@@ -21,9 +21,13 @@ async function noOverflow(page: Page) {
 }
 async function finishQuestions(page: Page, years = 5) {
   await page.goto("/coach");
+  await expect(page.locator(".chat-card").getByRole("slider")).toHaveCount(0);
+  await expect(
+    page.getByRole("slider", { name: "Monthly investment" }),
+  ).toHaveCount(1);
   await page
+    .getByRole("region", { name: "Your starting point" })
     .getByRole("slider", { name: "Monthly investment" })
-    .first()
     .focus();
   for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
   await page.getByRole("button", { name: "That feels comfortable" }).click();
@@ -38,6 +42,14 @@ async function finishQuestions(page: Page, years = 5) {
   await expect(
     page.getByRole("heading", { name: "A little clearer already." }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("slider", { name: "Monthly investment" }),
+  ).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("region", { name: "Your starting point" })
+      .getByRole("slider"),
+  ).toHaveAttribute("aria-valuenow", "750");
 }
 async function demoLogin(page: Page) {
   await page.goto("/onboarding/login");
@@ -206,9 +218,13 @@ test("changing the scenario requires reviewing a new demo activation", async ({
     .click();
   await expect(page).toHaveURL(/\/account\/success$/);
   await page.goto("/coach");
+  await expect(page.locator(".chat-card").getByRole("slider")).toHaveCount(0);
+  await expect(
+    page.getByRole("slider", { name: "Monthly investment" }),
+  ).toHaveCount(1);
   await page
+    .getByRole("region", { name: "Your starting point" })
     .getByRole("slider", { name: "Monthly investment" })
-    .first()
     .focus();
   await page.keyboard.press("ArrowRight");
   await page.goto("/account/success");
@@ -260,4 +276,67 @@ test("core pages pass automated accessibility checks", async ({ page }) => {
       nodes: v.nodes.map((n) => n.target),
     })),
   ).toEqual([]);
+});
+
+test("streams an answer immediately and allows drafting and stopping", async ({
+  page,
+}) => {
+  // Run a delayed stream in the page's transport so the UI can be examined between chunks.
+  await page.goto("/coach");
+  await page.evaluate(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (input, init) => {
+      if (String(input) !== "/api/coach") return originalFetch(input, init);
+      let timer: ReturnType<typeof setTimeout>;
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(
+            encoder.encode(
+              '{"type":"start","source":"bedrock"}\n{"type":"delta","text":"A bond is a loan."}\n',
+            ),
+          );
+          timer = setTimeout(() => {
+            controller.enqueue(
+              encoder.encode(
+                '{"type":"delta","text":" It can pay interest."}\n{"type":"done"}\n',
+              ),
+            );
+            controller.close();
+          }, 10000);
+          init?.signal?.addEventListener(
+            "abort",
+            () => {
+              clearTimeout(timer);
+              controller.error(new DOMException("Stopped", "AbortError"));
+            },
+            { once: true },
+          );
+        },
+        cancel() {
+          clearTimeout(timer);
+        },
+      });
+      return new Response(stream, {
+        headers: { "Content-Type": "application/x-ndjson" },
+      });
+    };
+  });
+  const input = page.getByRole("textbox", {
+    name: "Ask your investment coach",
+  });
+  await input.fill("What is a bond?");
+  await input.press("Enter");
+  await expect(page.locator(".streaming-reply")).toContainText(
+    "A bond is a loan.",
+  );
+  await input.fill("What about shares?");
+  await expect(input).toHaveValue("What about shares?");
+  await page.getByRole("button", { name: "Stop response" }).click();
+  await expect(page.locator(".message-stopped")).toContainText(
+    "Response stopped",
+  );
+  await expect(input).toHaveValue("What about shares?");
+  await expect(page.locator(".chat-notice")).toContainText("Response stopped");
+  await expect(page.locator(".chat-fallback")).toHaveCount(0);
 });

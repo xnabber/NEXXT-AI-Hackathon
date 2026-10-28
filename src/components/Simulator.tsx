@@ -79,9 +79,11 @@ export function Assumptions({ productId }: { productId?: string }) {
 }
 export function Simulator({
   controls = true,
+  monthlyControl = true,
   productId,
 }: {
   controls?: boolean;
+  monthlyControl?: boolean;
   productId?: string;
 }) {
   const { state, update } = useJourney();
@@ -160,14 +162,14 @@ export function Simulator({
               dataKey="year"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#66705a", fontSize: 11 }}
+              tick={{ fill: "#66705a", fontSize: 13 }}
               tickFormatter={(v) => `${v} yr`}
               minTickGap={25}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#66705a", fontSize: 10 }}
+              tick={{ fill: "#66705a", fontSize: 12 }}
               tickFormatter={(v) =>
                 v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`
               }
@@ -176,7 +178,7 @@ export function Simulator({
               contentStyle={{
                 borderRadius: 12,
                 border: "1px solid #e5e5dc",
-                fontSize: 12,
+                fontSize: 14,
               }}
               formatter={(value, name) => [
                 `${money(Number(value))} lei`,
@@ -235,20 +237,24 @@ export function Simulator({
       </div>
       {controls && (
         <div className="sim-controls">
-          <div className="control-title">
-            <label>Monthly investment</label>
-            <strong>
-              {money(state.monthly)} <span>lei</span>
-            </strong>
-          </div>
-          <Slider
-            value={state.monthly}
-            onChange={(monthly) => update({ monthly })}
-          />
-          <div className="slider-labels">
-            <span>100 lei</span>
-            <span>2,000 lei</span>
-          </div>
+          {monthlyControl && (
+            <>
+              <div className="control-title">
+                <label>Monthly investment</label>
+                <strong>
+                  {money(state.monthly)} <span>lei</span>
+                </strong>
+              </div>
+              <Slider
+                value={state.monthly}
+                onChange={(monthly) => update({ monthly })}
+              />
+              <div className="slider-labels">
+                <span>100 lei</span>
+                <span>2,000 lei</span>
+              </div>
+            </>
+          )}
           <div className="horizon-control">
             <span>
               <SlidersHorizontal size={14} /> Time horizon
@@ -290,10 +296,16 @@ export function Simulator({
     </section>
   );
 }
-export function MonthlyControl({ onContinue }: { onContinue: () => void }) {
+export function MonthlyControl({
+  onContinue,
+  compact = false,
+}: {
+  onContinue?: () => void;
+  compact?: boolean;
+}) {
   const { state, update } = useJourney();
   return (
-    <div className="question-control">
+    <div className={`question-control${compact ? " compact" : ""}`}>
       <div className="monthly-display">
         {money(state.monthly)}
         <span> lei / month</span>
@@ -318,12 +330,16 @@ export function MonthlyControl({ onContinue }: { onContinue: () => void }) {
           </button>
         ))}
       </div>
-      <Button onClick={onContinue}>
-        That feels comfortable <ArrowUpRight size={17} />
-      </Button>
-      <p className="fine-print">
-        Start with an amount that leaves room for everyday life.
-      </p>
+      {onContinue && (
+        <Button onClick={onContinue}>
+          That feels comfortable <ArrowUpRight size={17} />
+        </Button>
+      )}
+      {!compact && (
+        <p className="fine-print">
+          Start with an amount that leaves room for everyday life.
+        </p>
+      )}
     </div>
   );
 }
