@@ -213,5 +213,14 @@
   "category_transfers": "Transferuri",
   "chatTab": "Conversație",
   "planTab": "Plan",
-  "toolsTab": "Instrumente"
+  "toolsTab": "Instrumente",
+  "confirmationRate": "Rata de confirmare a propunerilor",
+  "averageTools": "Instrumente per conversație",
+  "costPerConversation": "Cost per conversație",
+  "costPerActivation": "Cost per plan activat",
+  "retentionNote": "Indicatorii acoperă evenimentele de audit păstrate în memorie:",
+  "daily": "Conversații pe zi",
+  "funnel": "Parcurs demo",
+  "topTools": "Cele mai folosite instrumente",
+  "refusals": "Refuzuri și motive de rezervă"
 }

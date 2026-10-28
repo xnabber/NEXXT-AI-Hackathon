@@ -2,6 +2,7 @@
 require('./src/config.js').loadEnv();
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {MemoryStore}=require('./src/store.js');const {agentTurn}=require('./src/agent/agent.js');const {createProvider}=require('./src/agent/provider.js');const {executeTool,inferRisk}=require('./src/tools/index.js');const {confirmProposal,publicProposal}=require('./src/bank.js');const {personas}=require('./src/data/index.js');const {products}=require('./src/products.js');const {purchasingPower}=require('./src/engine.js');const {settings}=require('./src/config.js');const {clean}=require('./src/agent/intent.js');
+const {metrics}=require('./src/metrics.js');
 const ROOT=path.join(__dirname,'public');
 function createApp(options={}){
  const store=options.store||new MemoryStore(),config={...settings(),...options.config},limits=new Map();
@@ -74,7 +75,7 @@ function createApp(options={}){
      }else if(stage==='review'&&input.step==='complete'&&session.otpVerified&&input.demo===true){const before={...session.memory};store.selectPersona(session,'ioana');if(before.explicit)session.memory={...session.memory,...before};session.onboardingStage='complete';store.record(session,'signup_completed');}
      else return send(res,409,{error:{code:'ONBOARDING_ORDER'}});return send(res,200,bootstrap(session));
     }
-    if(req.method==='GET'&&url.pathname==='/api/admin'){if(!allowAdmin(req))return send(res,403,{error:{code:'ADMIN_REQUIRED'}});const turns=store.audit.filter(e=>e.type==='turn');return send(res,200,{events:store.audit,turns:turns.length,plans:store.plans.size,proposals:store.proposals.size});}
+    if(req.method==='GET'&&url.pathname==='/api/admin'){if(!allowAdmin(req))return send(res,403,{error:{code:'ADMIN_REQUIRED'}});const turns=store.audit.filter(e=>e.type==='turn');return send(res,200,{events:store.audit,metrics:metrics(store),turns:turns.length,plans:store.plans.size,proposals:store.proposals.size});}
     return send(res,404,{error:{code:'NOT_FOUND'}});
    }
    const relative=url.pathname.startsWith('/i18n/')?url.pathname:'/index.html';

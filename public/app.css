@@ -6,3 +6,5 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 
 .workspace-tabs{display:none}@media(max-width:760px){.workspace-tabs{display:flex;position:sticky;top:0;z-index:25;background:#edf2e3;border:1px solid #d6e1c7;padding:5px;border-radius:10px;gap:5px;margin-bottom:20px}.workspace-tabs a{flex:1;padding:10px;text-align:center;border-radius:7px;font-size:.8rem}.workspace-tabs a:hover{background:#fff}}
+
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:1rem}.admin-grid .tool-card{min-width:0}

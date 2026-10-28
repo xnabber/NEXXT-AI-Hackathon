@@ -213,5 +213,14 @@
   "category_transfers": "Transfers",
   "chatTab": "Chat",
   "planTab": "Plan",
-  "toolsTab": "Tools"
+  "toolsTab": "Tools",
+  "confirmationRate": "Proposal confirmation rate",
+  "averageTools": "Tools per conversation",
+  "costPerConversation": "Cost per conversation",
+  "costPerActivation": "Cost per activated plan",
+  "retentionNote": "Metrics cover retained in-memory audit events:",
+  "daily": "Conversations per day",
+  "funnel": "Demo funnel",
+  "topTools": "Most used tools",
+  "refusals": "Refusals and fallback reasons"
 }

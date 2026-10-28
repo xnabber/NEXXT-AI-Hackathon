@@ -27,7 +27,7 @@ function executeTool(store,session,name,input={},notify=()=>{}){
   if(!spec)output=failure('UNKNOWN_TOOL','Unknown tool.');
   else if(input&&typeof input==='object'&&Object.hasOwn(input,'customerId'))output=failure('FORBIDDEN','Tools are scoped to the session customer.');
   else if(!valid(spec.inputSchema,input))output=failure('INVALID_INPUT','The tool input does not match its schema.');
-  else output=run(store,session,name,input);
+  else output=store.toolValue?store.toolValue(session,name,input,()=>run(store,session,name,input)):run(store,session,name,input);
  }catch{output=failure('TOOL_FAILURE','The tool could not complete. Please try a simpler request.');}
  let safeInput;try{safeInput=JSON.parse(JSON.stringify(input||{}));}catch{safeInput={invalid:true};}
  const event={tool:name,input:safeInput,output,summary:output.error?output.error.code:output.ui?.type||'completed',ms:Math.round((performance.now()-start)*100)/100};
