@@ -162,14 +162,14 @@ export function Simulator({
               dataKey="year"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#66705a", fontSize: 11 }}
+              tick={{ fill: "#66705a", fontSize: 13 }}
               tickFormatter={(v) => `${v} yr`}
               minTickGap={25}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#66705a", fontSize: 10 }}
+              tick={{ fill: "#66705a", fontSize: 12 }}
               tickFormatter={(v) =>
                 v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`
               }
@@ -178,7 +178,7 @@ export function Simulator({
               contentStyle={{
                 borderRadius: 12,
                 border: "1px solid #e5e5dc",
-                fontSize: 12,
+                fontSize: 14,
               }}
               formatter={(value, name) => [
                 `${money(Number(value))} lei`,

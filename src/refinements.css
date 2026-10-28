@@ -1,0 +1,1866 @@
+/* Fluid, readable type and layouts: no browser zoom or transform scaling. */
+:root {
+  font-size: clamp(16px, calc(14px + 0.15vw), 18px);
+  --page-gutter: clamp(20px, 3.2vw, 80px);
+  --muted: #62695e;
+  --line: #e2e6da;
+  --cream: #f6f7f2;
+  background: #f7f8f3;
+  color: #23271f;
+}
+body {
+  font-size: 1rem;
+}
+.container {
+  width: calc(100% - var(--page-gutter) * 2);
+  max-width: 1760px;
+}
+.site-header {
+  background: #fff;
+  border-bottom-color: #e2e6da;
+}
+.header-inner {
+  max-width: 1920px;
+  padding: 22px var(--page-gutter);
+  min-height: 92px;
+  gap: 24px;
+}
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+.brand-words strong {
+  font-size: 1.35rem;
+}
+.brand-words > span {
+  font-size: 0.8rem;
+  color: #5f6858;
+}
+.concept {
+  font-size: 0.6rem;
+  padding: 4px 5px;
+}
+.demo-badge {
+  font-size: 0.65rem;
+  padding: 9px 12px;
+  border-radius: 6px;
+}
+.desktop-nav {
+  font-size: 0.9rem;
+  gap: clamp(18px, 2vw, 36px);
+}
+.journey-nav {
+  gap: 14px;
+}
+.journey-step {
+  font-size: 0.8rem;
+  gap: 8px;
+}
+.step-number {
+  width: 29px;
+  height: 29px;
+  font-size: 0.7rem;
+}
+.step-line {
+  width: 24px;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 1rem;
+}
+.button {
+  min-height: 48px;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+.button-small {
+  font-size: 0.85rem;
+  min-height: 42px;
+}
+.button-primary {
+  box-shadow: 0 3px 0 #c8ba1717;
+}
+.button-primary:not(:disabled):hover {
+  background: #f1dc00;
+  box-shadow: 0 4px 12px #a29a1620;
+}
+.button-icon {
+  width: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 11px;
+}
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+}
+.text-link,
+.text-button {
+  font-size: 0.875rem;
+}
+.text-input,
+.chat-composer textarea {
+  font-size: 1rem;
+}
+.text-input {
+  min-height: 50px;
+  padding: 14px 16px;
+  border-radius: 9px;
+}
+.fine-print,
+.disclosure,
+.composer-note {
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+.disclosure svg {
+  width: 17px;
+  height: 17px;
+}
+.back-link {
+  font-size: 0.8rem;
+  padding-block: 6px;
+}
+.educational-pill {
+  font-size: 0.7rem;
+  padding: 7px 11px;
+  background: #fff;
+}
+.page-intro h1 {
+  font-size: clamp(2.1rem, 3vw, 3rem);
+  line-height: 1.14;
+  max-width: 980px;
+}
+.page-intro > p {
+  font-size: 1rem;
+  max-width: 780px;
+}
+/* Campaign */
+.hero {
+  gap: clamp(35px, 5vw, 100px);
+  padding-block: clamp(55px, 6vw, 110px);
+}
+.hero h1 {
+  font-size: clamp(3rem, 4.5vw, 5.5rem);
+}
+.hero-description {
+  font-size: 1.05rem;
+  max-width: 520px;
+}
+.hero-actions .button {
+  font-size: 0.95rem;
+  min-height: 54px;
+}
+.how-link {
+  font-size: 0.875rem;
+  min-height: 36px;
+}
+.hero-reassurance {
+  font-size: 0.8rem;
+  gap: 23px;
+}
+.hero-art {
+  min-height: clamp(450px, 32vw, 610px);
+  border-radius: 24px;
+}
+.growth-card {
+  max-width: 470px;
+  padding: 27px 30px;
+  border-radius: 18px;
+}
+.growth-card-heading {
+  font-size: 0.85rem;
+}
+.growth-value {
+  font-size: clamp(1.8rem, 2.2vw, 2.5rem);
+}
+.growth-value > span {
+  font-size: 1.1rem;
+}
+.growth-visual svg {
+  height: 160px;
+}
+.growth-card-footer,
+.hero-chart-labels {
+  font-size: 0.7rem;
+}
+.floating-coach {
+  max-width: 370px;
+  font-size: 0.8rem;
+  padding: 19px;
+  border-radius: 14px;
+}
+.art-label {
+  font-size: 0.7rem;
+}
+.art-caption {
+  font-size: 0.65rem;
+}
+.trust-strip {
+  background: #fff;
+}
+.trust-strip > .container {
+  padding-block: 26px;
+  flex-wrap: wrap;
+}
+.trust-strip span {
+  font-size: 0.875rem;
+}
+.section-copy h2 {
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+.section-copy p {
+  font-size: 1rem;
+  max-width: 460px;
+}
+.section-copy .text-link {
+  font-size: 0.875rem;
+}
+.inflation-section {
+  gap: clamp(36px, 6vw, 110px);
+}
+.inflation-card {
+  border-radius: 18px;
+  padding: 28px 32px;
+  background: #fff;
+}
+.inflation-top > span {
+  font-size: 0.8rem;
+}
+.segmented button {
+  font-size: 0.75rem;
+  min-width: 37px;
+  min-height: 33px;
+}
+.inflation-stats > div > span {
+  font-size: 0.8rem;
+}
+.inflation-stats strong {
+  font-size: clamp(1.6rem, 2.2vw, 2.4rem);
+}
+.inflation-stats strong small {
+  font-size: 0.9rem;
+}
+.loss-tag,
+.purchasing-column label,
+.inflation-footnote p {
+  font-size: 0.7rem;
+}
+.purchasing-column > span {
+  font-size: 0.7rem;
+}
+.purchasing-bars {
+  height: 140px;
+  margin-top: 32px;
+}
+.inflation-footnote {
+  margin-top: 21px;
+}
+.how-section {
+  background: #eef1e6;
+  padding-block: 72px;
+}
+.center-heading h2,
+.section-heading-row h2 {
+  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
+}
+.center-heading > p,
+.section-heading-row > p {
+  font-size: 0.95rem;
+}
+.journey-cards {
+  gap: 22px;
+  margin-top: 38px;
+}
+.journey-card,
+.concern-card {
+  border-radius: 16px;
+  padding: 28px;
+  border-color: #e0e6d5;
+  background: #fff;
+}
+.journey-card .eyebrow {
+  font-size: 0.7rem;
+}
+.journey-card h3,
+.concern-card h3 {
+  font-size: 1.2rem;
+}
+.journey-card p,
+.concern-card p {
+  font-size: 0.95rem;
+}
+.concern-card a {
+  font-size: 0.85rem;
+}
+.journey-icon {
+  height: 48px;
+  width: 48px;
+  border-radius: 12px;
+}
+.closing-cta {
+  padding: 36px 40px;
+  border-radius: 20px;
+  gap: 28px;
+  background: #f7e94c;
+}
+.closing-cta h2 {
+  font-size: clamp(1.4rem, 2vw, 2rem);
+}
+.closing-cta p {
+  font-size: 0.95rem;
+}
+.closing-cta .button {
+  font-size: 0.85rem;
+}
+.footer {
+  max-width: 1840px;
+  margin-inline: var(--page-gutter);
+  padding-block: 34px;
+}
+.footer p {
+  font-size: 0.75rem;
+}
+.footer-links {
+  font-size: 0.8rem;
+}
+/* Coach workspace */
+.coach-page {
+  padding-top: 24px;
+}
+.coach-heading {
+  margin-block: 25px 28px;
+}
+.coach-heading h1 {
+  font-size: clamp(2rem, 2.6vw, 3rem);
+}
+.coach-heading p {
+  font-size: 0.95rem;
+}
+.coach-heading-decoration {
+  width: 60px;
+  height: 60px;
+  background: #f5ed9f;
+}
+.coach-section-nav {
+  display: none;
+}
+.coach-grid {
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-areas: "preferences preferences" "conversation projection";
+}
+.coach-preferences,
+.chat-card,
+.simulator {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #dde4d0;
+  box-shadow: 0 3px 15px #38451a04;
+}
+.coach-preferences {
+  padding: 25px 28px;
+}
+.preferences-heading h2 {
+  font-size: 1.35rem;
+}
+.preferences-heading .eyebrow {
+  font-size: 0.7rem;
+}
+.preferences-heading .chat-header-step {
+  font-size: 0.8rem;
+  color: #536442;
+  background: #f1f4e8;
+  padding: 8px;
+  border-radius: 8px;
+}
+.question-label {
+  font-size: 0.7rem;
+}
+.question-panel h3 {
+  font-size: 1.1rem;
+  line-height: 1.45;
+  letter-spacing: -0.025em;
+}
+.coach-preferences .question-control {
+  background: #f7f8f2;
+  border-color: #e6eadb;
+  border-radius: 12px;
+}
+.monthly-display {
+  font-size: 2.35rem;
+}
+.monthly-display span {
+  font-size: 0.85rem;
+}
+.slider {
+  height: 28px;
+}
+.slider-track {
+  height: 7px;
+}
+.slider-range {
+  background: #ddca00;
+}
+.slider-thumb {
+  width: 24px;
+  height: 24px;
+  border: 4px solid #fff;
+  background: #877d20;
+  outline-color: #d6cf7f;
+}
+.slider-labels {
+  font-size: 0.75rem;
+}
+.amount-chips {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.amount-chips button {
+  font-size: 0.8rem;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 7px;
+}
+.question-control .button {
+  font-size: 0.85rem;
+  min-height: 46px;
+}
+.question-control .fine-print {
+  font-size: 0.7rem;
+}
+.choice-stack > button {
+  padding: 15px;
+  border-radius: 10px;
+  min-height: 76px;
+}
+.choice-stack strong {
+  font-size: 0.9rem;
+}
+.choice-stack small {
+  font-size: 0.75rem;
+}
+.question-control.compact .monthly-display {
+  font-size: 1.8rem;
+}
+.monthly-adjustment-label {
+  font-size: 0.8rem;
+}
+.conversation-complete h3 {
+  font-size: 1.1rem;
+}
+.conversation-complete p {
+  font-size: 0.85rem;
+}
+.conversation-complete .button {
+  font-size: 0.85rem;
+}
+.coach-grid > .chat-card {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 24px;
+  height: clamp(580px, calc(100dvh - 230px), 900px);
+  min-width: 0;
+}
+.chat-header {
+  padding: 22px 25px;
+  background: #fff;
+  gap: 13px;
+}
+.chat-header h2 {
+  font-size: 1.1rem;
+}
+.chat-header > div > span {
+  font-size: 0.75rem;
+  margin-top: 7px;
+}
+.chat-header .coach-orb {
+  width: 46px;
+  height: 46px;
+}
+.chat-body {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  padding: 26px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.chat-welcome {
+  gap: 12px;
+}
+.chat-welcome p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #46513c;
+}
+.message-avatar {
+  width: 30px;
+  height: 30px;
+  background: #f4efbc;
+  color: #6f763b;
+}
+.message-note {
+  font-size: 0.75rem;
+  margin-top: 12px;
+}
+.message-list {
+  gap: 20px;
+}
+.message {
+  gap: 10px;
+}
+.message-bubble {
+  font-size: 1rem;
+  line-height: 1.75;
+  padding: 16px 18px;
+  color: #394331;
+  background: #f4f6ef;
+  border-color: #e6ebdc;
+  border-radius: 3px 15px 15px 15px;
+}
+.message.user .message-bubble {
+  background: #fff5ae;
+  border-color: #f0e6a3;
+  color: #514a22;
+  border-radius: 15px 3px 15px 15px;
+}
+.message-source,
+.message-stopped {
+  font-size: 0.7rem;
+  margin-top: 10px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: #5f7350;
+}
+.message-stopped {
+  color: #6c6b58;
+}
+.chat-starters {
+  display: grid;
+  gap: 12px;
+  margin: 26px 0 12px 42px;
+}
+.starter-caption {
+  font-size: 0.75rem;
+  color: #68745b;
+}
+.chat-starters > button {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid #e4e9d8;
+  border-radius: 12px;
+  background: #fafbf6;
+  text-align: left;
+  color: #657847;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.chat-starters > button:hover {
+  background: #f2f5e9;
+  border-color: #bdcba0;
+}
+.chat-starters > button > span {
+  flex: 1;
+  min-width: 0;
+}
+.chat-starters strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #36432b;
+  font-weight: 600;
+}
+.chat-starters small {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  margin-top: 5px;
+  color: #657351;
+}
+.chat-composer-area {
+  padding: 17px 22px;
+  background: #fcfdf9;
+}
+.quick-replies {
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.quick-replies button {
+  font-size: 0.75rem;
+  padding: 8px 11px;
+  min-height: 36px;
+  border-color: #dfe6d2;
+  color: #586b43;
+}
+.chat-composer {
+  align-items: flex-end;
+  padding: 7px;
+  gap: 6px;
+  border-radius: 12px;
+  border-color: #cdd9b8;
+}
+.chat-composer textarea {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+  max-height: 128px;
+  resize: none;
+  border: 0;
+  background: transparent;
+  outline: none;
+  padding: 11px 8px;
+  line-height: 1.5;
+  color: #33422b;
+}
+.chat-composer textarea::placeholder {
+  color: #727c68;
+}
+.chat-composer .button {
+  width: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 11px;
+  border-radius: 9px;
+}
+.composer-note {
+  font-size: 0.7rem;
+  margin-top: 11px;
+  line-height: 1.65;
+}
+.chat-fallback,
+.chat-notice {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+.chat-notice {
+  color: #5f7050;
+}
+.typing {
+  font-size: 0.9rem;
+  gap: 10px;
+  align-items: center;
+}
+.typing-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.typing-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #8d965d;
+  animation: typing-pulse 1.2s infinite;
+}
+.typing-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stream-caret {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  margin-left: 4px;
+  background: #7b854e;
+  vertical-align: text-bottom;
+  animation: typing-pulse 1s infinite;
+}
+@keyframes typing-pulse {
+  0%,
+  70%,
+  100% {
+    opacity: 0.35;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+.simulator {
+  padding: 26px;
+}
+.section-topline {
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.section-topline .eyebrow {
+  font-size: 0.7rem;
+}
+.live-tag {
+  font-size: 0.65rem;
+}
+.sim-tabs {
+  margin-top: 20px;
+  border-radius: 9px;
+}
+.sim-tabs button {
+  font-size: 0.8rem;
+  padding: 9px 12px;
+  min-height: 38px;
+}
+.projection-number {
+  font-size: clamp(2.5rem, 3.3vw, 3.9rem);
+  margin-top: 23px;
+}
+.projection-number > span {
+  font-size: 1.15rem;
+}
+.projection-caption {
+  font-size: 0.85rem;
+}
+.chart-wrap {
+  height: clamp(230px, 27vh, 330px);
+  margin-top: 23px;
+}
+.chart-legend {
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+.chart-legend > span {
+  font-size: 0.7rem;
+}
+.projection-breakdown {
+  padding-block: 20px;
+}
+.projection-breakdown span {
+  font-size: 0.75rem;
+}
+.projection-breakdown strong {
+  font-size: 1.5rem;
+}
+.projection-breakdown small {
+  font-size: 0.8rem;
+}
+.horizon-control {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.horizon-control > span {
+  font-size: 0.8rem;
+}
+.horizon-options {
+  flex-wrap: wrap;
+}
+.horizon-options button {
+  min-width: 38px;
+  min-height: 36px;
+  font-size: 0.75rem;
+  border-radius: 7px;
+}
+.sim-assumptions > span,
+.sim-assumptions .text-button {
+  font-size: 0.75rem;
+}
+.scenario-range {
+  padding: 13px;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  border-radius: 9px;
+}
+.simulator > .fine-print {
+  font-size: 0.7rem;
+}
+.coach-aside-note {
+  padding: 17px;
+  border-radius: 12px;
+}
+.coach-aside-note p {
+  font-size: 0.8rem;
+}
+.simulator-column > .disclosure {
+  font-size: 0.7rem;
+}
+.coach-bottom-note {
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+.coach-bottom-note > a {
+  font-size: 0.8rem;
+}
+/* Account and product screens share the same legible scale. */
+.onboarding-grid {
+  gap: clamp(30px, 5vw, 85px);
+}
+.onboarding-grid .page-intro h1 {
+  font-size: clamp(2.2rem, 3.5vw, 3.3rem);
+  max-width: 620px;
+}
+.onboarding-option {
+  padding: 28px;
+  border-radius: 16px;
+  background: #fff;
+}
+.onboarding-option h2 {
+  font-size: 1.3rem;
+}
+.onboarding-option p {
+  font-size: 0.95rem;
+}
+.onboarding-option div > span {
+  font-size: 0.85rem;
+}
+.journey-summary {
+  padding: 40px;
+  border-radius: 20px;
+}
+.journey-summary h2 {
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+.saved-simulation strong {
+  font-size: 2rem;
+}
+.saved-simulation strong small {
+  font-size: 1rem;
+}
+.saved-simulation > span,
+.saved-simulation div > span,
+.saved-simulation > p,
+.summary-bottom {
+  font-size: 0.75rem;
+}
+.form-card,
+.plan-review {
+  padding: 32px;
+  background: #fff;
+  border-radius: 18px;
+}
+.form-card h2 {
+  font-size: 1.5rem;
+}
+.form-card > p {
+  font-size: 0.95rem;
+}
+.field-label,
+.plan-details dt,
+.plan-schedule > label {
+  font-size: 0.9rem;
+}
+.identity-note,
+.illustrative-checks small {
+  font-size: 0.75rem;
+}
+.illustrative-checks > p,
+.checkbox-label,
+.plan-review .checkbox-label {
+  font-size: 0.85rem;
+}
+.form-card .field-label {
+  font-size: 0.9rem;
+}
+.form-steps {
+  font-size: 0.8rem;
+}
+.investment-summary-bar {
+  padding: 24px 28px;
+  border-radius: 16px;
+  gap: 35px;
+}
+.investment-summary-bar > div > span:last-child {
+  font-size: 0.75rem;
+}
+.investment-summary-bar strong {
+  font-size: 1rem;
+}
+.investment-summary-bar > a {
+  font-size: 0.8rem;
+}
+.product-filter-row {
+  flex-wrap: wrap;
+}
+.filter-tabs {
+  flex-wrap: wrap;
+}
+.filter-tabs button {
+  font-size: 0.85rem;
+  min-height: 42px;
+}
+.product-grid {
+  gap: 24px;
+}
+.product-card {
+  padding: 30px;
+  border-radius: 18px;
+}
+.product-card h2 {
+  font-size: 1.8rem;
+}
+.product-card .eyebrow {
+  font-size: 0.7rem;
+}
+.product-description {
+  font-size: 0.95rem;
+  min-height: 85px;
+}
+.allocation,
+.risk-scale,
+.product-liquidity {
+  font-size: 0.8rem;
+}
+.risk-scale strong {
+  font-size: 0.95rem;
+}
+.selected-tag,
+.product-horizon {
+  font-size: 0.75rem;
+}
+.product-numbers > div > span {
+  font-size: 0.75rem;
+}
+.product-numbers strong {
+  font-size: 1.8rem;
+}
+.product-numbers strong small {
+  font-size: 0.75rem;
+}
+.product-card > .text-button {
+  font-size: 0.85rem;
+}
+.product-card > .button,
+.investment-continue > .button {
+  font-size: 0.85rem;
+}
+.investment-continue > div strong {
+  font-size: 0.95rem;
+}
+.investment-continue > div small,
+.product-disclaimer {
+  font-size: 0.75rem;
+}
+.plan-fund-header h2 {
+  font-size: 1.5rem;
+}
+.plan-fund-header p {
+  font-size: 0.8rem;
+}
+.plan-fund-header > a {
+  font-size: 0.8rem;
+}
+.plan-details dd {
+  font-size: 1.1rem;
+}
+.plan-schedule > p {
+  font-size: 0.75rem;
+}
+.plan-schedule .text-input {
+  font-size: 1rem;
+}
+.risk-notice {
+  padding: 20px;
+  border-radius: 12px;
+}
+.risk-notice strong {
+  font-size: 0.9rem;
+}
+.risk-notice p {
+  font-size: 0.85rem;
+}
+.plan-review > .button {
+  font-size: 0.9rem;
+}
+.activation-note,
+.plan-question {
+  font-size: 0.8rem;
+}
+.plan-question a {
+  font-size: 0.8rem;
+}
+.success-page {
+  max-width: 1200px;
+}
+.success-heading h1 {
+  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+}
+.success-heading > p {
+  font-size: 1rem;
+}
+.success-plan,
+.next-cards article {
+  border-radius: 18px;
+  background: #fff;
+}
+.success-plan {
+  padding: 34px;
+}
+.success-plan h2 {
+  font-size: 1.8rem;
+}
+.success-metrics > div > span {
+  font-size: 0.85rem;
+}
+.success-metrics strong {
+  font-size: 2.3rem;
+}
+.success-metrics small {
+  font-size: 0.9rem;
+}
+.success-plan-bottom > span,
+.success-plan-bottom .button,
+.success-demo,
+.demo-active {
+  font-size: 0.75rem;
+}
+.next-heading h2 {
+  font-size: 1.8rem;
+}
+.next-heading p {
+  font-size: 0.95rem;
+}
+.next-cards h3 {
+  font-size: 1.2rem;
+}
+.next-cards p {
+  font-size: 0.95rem;
+}
+.next-cards .text-link {
+  font-size: 0.8rem;
+}
+.dialog-content {
+  width: min(620px, calc(100% - 32px));
+  padding: 36px;
+  border-radius: 20px;
+}
+.dialog-title {
+  font-size: 1.8rem;
+}
+.dialog-content > .muted,
+.dialog-body p {
+  font-size: 0.95rem;
+}
+.detail-list > div {
+  font-size: 0.85rem;
+}
+@media (min-width: 1100px) and (max-width: 1439px) {
+  .coach-preferences {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 18px 30px;
+    align-items: start;
+  }
+  .coach-preferences .question-panel {
+    margin: 0;
+  }
+  .preferences-heading {
+    align-items: flex-start;
+  }
+  .coach-preferences .question-control:not(.compact) {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "amount presets confirm" "slider slider slider" "limits limits limits" "note note note";
+    gap: 5px 15px;
+    padding: 17px 20px;
+    margin-top: 15px;
+  }
+  .question-control:not(.compact) .monthly-display {
+    grid-area: amount;
+    margin: 0;
+    font-size: 1.9rem;
+    white-space: nowrap;
+  }
+  .question-control:not(.compact) .slider {
+    grid-area: slider;
+    margin-top: 8px;
+  }
+  .question-control:not(.compact) .slider-labels {
+    grid-area: limits;
+  }
+  .question-control:not(.compact) .amount-chips {
+    grid-area: presets;
+    margin: 0;
+    align-self: center;
+  }
+  .question-control:not(.compact) .button {
+    grid-area: confirm;
+    width: auto;
+    align-self: center;
+  }
+  .question-control:not(.compact) .fine-print {
+    grid-area: note;
+  }
+  .coach-preferences .monthly-adjustment {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 0;
+  }
+  .coach-preferences:has(.monthly-adjustment) .question-panel,
+  .coach-preferences:has(.monthly-adjustment) .conversation-complete {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    margin-top: 0;
+  }
+  .coach-preferences .choice-stack {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .choice-stack > button {
+    min-height: 100px;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+@media (min-width: 1440px) {
+  .coach-grid > .chat-card {
+    height: clamp(520px, calc(100dvh - 400px), 900px);
+  }
+  .coach-grid {
+    grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.69fr) minmax(
+        0,
+        1fr
+      );
+    grid-template-areas: "conversation preferences projection";
+    grid-template-rows: 1fr;
+    gap: 22px;
+  }
+  .coach-preferences {
+    padding: 23px;
+  }
+  .preferences-heading {
+    align-items: flex-start;
+    gap: 9px;
+  }
+  .preferences-heading h2 {
+    font-size: 1.2rem;
+  }
+  .coach-preferences .question-panel {
+    margin-top: 22px;
+  }
+  .coach-preferences .question-control {
+    padding: 17px;
+  }
+  .coach-preferences .question-control.compact {
+    padding: 0;
+  }
+  .question-control .button {
+    font-size: 0.8rem;
+    padding-inline: 10px;
+    gap: 7px;
+  }
+  .monthly-display {
+    font-size: 2.2rem;
+  }
+  .monthly-display span {
+    font-size: 0.75rem;
+  }
+  .simulator {
+    padding: 23px;
+  }
+  .projection-breakdown strong {
+    font-size: 1.35rem;
+  }
+  .projection-breakdown > div + div {
+    padding-left: 15px;
+  }
+  .sim-tabs button {
+    padding-inline: 9px;
+    font-size: 0.75rem;
+  }
+  .horizon-options button {
+    min-width: 34px;
+    padding-inline: 7px;
+  }
+}
+@media (min-width: 2200px) {
+  .container {
+    max-width: 2080px;
+  }
+  .header-inner {
+    max-width: 2240px;
+  }
+  .coach-grid {
+    gap: 30px;
+  }
+  .coach-preferences,
+  .simulator {
+    padding: 30px;
+  }
+  .preferences-heading h2 {
+    font-size: 1.4rem;
+  }
+  .question-panel h3 {
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 1099px) {
+  .header-inner {
+    padding: 18px var(--page-gutter);
+    min-height: 80px;
+  }
+  .journey-nav {
+    display: none;
+  }
+  .mobile-menu {
+    display: grid;
+    place-items: center;
+    padding: 8px;
+  }
+  .mobile-progress {
+    display: block;
+    padding: 10px var(--page-gutter);
+    font-size: 0.75rem;
+    background: #f2f5e9;
+    border-bottom: 1px solid #e2e8d7;
+  }
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+    gap: 18px;
+    background: white;
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid #dce6ce;
+    font-size: 1rem;
+  }
+  .coach-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "preferences" "conversation" "projection";
+    grid-template-rows: auto;
+  }
+  .coach-grid > .chat-card {
+    position: static;
+    height: clamp(580px, 80dvh, 850px);
+  }
+  .coach-section-nav {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    background: #edf1e3;
+    border: 1px solid #e0e6d3;
+    border-radius: 11px;
+    margin-bottom: 22px;
+    width: max-content;
+    max-width: 100%;
+  }
+  .coach-section-nav a {
+    padding: 9px 12px;
+    font-size: 0.8rem;
+    border-radius: 7px;
+  }
+  .coach-section-nav a:hover {
+    background: white;
+  }
+  .desktop-nav > a {
+    display: none;
+  }
+  .step-line {
+    display: none;
+  }
+  .coach-preferences .question-control {
+    padding: 22px;
+  }
+  .coach-preferences .question-control.compact {
+    padding: 0;
+  }
+  .investment-summary-bar {
+    flex-wrap: wrap;
+    gap: 23px;
+  }
+  .investment-summary-bar > a {
+    margin-left: 0;
+  }
+  .onboarding-grid {
+    gap: 30px;
+  }
+  .product-grid {
+    gap: 17px;
+  }
+  .product-card {
+    padding: 23px;
+  }
+  .product-description {
+    min-height: 100px;
+  }
+  .footer {
+    margin-inline: var(--page-gutter);
+  }
+  .hero h1 {
+    font-size: clamp(2.9rem, 5vw, 4rem);
+  }
+  .hero-art {
+    min-height: 470px;
+  }
+  .hero-description {
+    font-size: 1rem;
+  }
+  .closing-cta {
+    flex-wrap: wrap;
+  }
+  .closing-cta .button {
+    margin-left: 0;
+  }
+}
+@media (max-width: 720px) {
+  :root {
+    --page-gutter: 20px;
+  }
+  .header-inner {
+    gap: 10px;
+    padding: 16px 18px;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+  .brand-words strong {
+    font-size: 1.05rem;
+  }
+  .brand-words > span {
+    font-size: 0.7rem;
+  }
+  .concept {
+    font-size: 0.5rem;
+  }
+  .header-actions {
+    gap: 6px;
+  }
+  .header-actions .demo-badge {
+    font-size: 0.5rem;
+    padding: 6px;
+  }
+  .header-actions .avatar {
+    display: none;
+  }
+  .mobile-menu {
+    padding: 5px;
+  }
+  .hero {
+    padding-block: 38px;
+    gap: 32px;
+  }
+  .hero h1 {
+    font-size: clamp(2.7rem, 10.4vw, 4.5rem);
+  }
+  .hero-copy .eyebrow {
+    font-size: 0.65rem;
+  }
+  .hero-description {
+    font-size: 1rem;
+  }
+  .hero-actions .button {
+    width: 100%;
+    font-size: 0.8rem;
+    padding-inline: 12px;
+  }
+  .hero-reassurance {
+    font-size: 0.7rem;
+    gap: 13px;
+    flex-wrap: wrap;
+  }
+  .hero-art {
+    min-height: 420px;
+    padding-inline: 23px;
+  }
+  .growth-card {
+    padding: 23px;
+  }
+  .growth-card-heading {
+    font-size: 0.7rem;
+  }
+  .growth-value {
+    font-size: 1.6rem;
+  }
+  .growth-value > span {
+    font-size: 0.95rem;
+  }
+  .growth-visual svg {
+    height: 120px;
+  }
+  .floating-coach {
+    padding: 14px;
+    max-width: 290px;
+    font-size: 0.7rem;
+  }
+  .art-label {
+    font-size: 0.6rem;
+  }
+  .art-caption {
+    font-size: 0.55rem;
+  }
+  .trust-strip > .container {
+    gap: 19px 12px;
+  }
+  .trust-strip span {
+    font-size: 0.7rem;
+    gap: 6px;
+  }
+  .inflation-section {
+    gap: 28px;
+    padding-block: 46px;
+  }
+  .section-copy h2 {
+    font-size: 2rem;
+  }
+  .section-copy p {
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+  .inflation-card {
+    padding: 20px;
+  }
+  .inflation-top {
+    flex-wrap: wrap;
+    gap: 13px;
+  }
+  .inflation-top > span {
+    font-size: 0.75rem;
+  }
+  .inflation-stats {
+    gap: 8px;
+  }
+  .inflation-stats > div > span {
+    font-size: 0.65rem;
+  }
+  .inflation-stats strong {
+    font-size: 1.55rem;
+  }
+  .inflation-stats strong small {
+    font-size: 0.75rem;
+  }
+  .loss-tag {
+    font-size: 0.65rem;
+    padding: 5px;
+  }
+  .purchasing-column label,
+  .purchasing-column > span {
+    font-size: 0.6rem;
+  }
+  .inflation-footnote p {
+    font-size: 0.65rem;
+  }
+  .how-section {
+    padding-block: 45px;
+  }
+  .center-heading h2,
+  .section-heading-row h2 {
+    font-size: 1.8rem;
+  }
+  .center-heading > p,
+  .section-heading-row > p {
+    font-size: 0.875rem;
+  }
+  .journey-card {
+    padding: 21px 17px;
+  }
+  .journey-card h3 {
+    font-size: 1rem;
+  }
+  .journey-card p {
+    font-size: 0.8rem;
+  }
+  .journey-card .eyebrow {
+    font-size: 0.6rem;
+  }
+  .concern-card {
+    padding: 25px;
+  }
+  .concern-card h3 {
+    font-size: 1.2rem;
+  }
+  .concern-card p {
+    font-size: 0.95rem;
+  }
+  .closing-cta {
+    padding: 26px;
+    border-radius: 17px;
+    gap: 14px;
+  }
+  .closing-cta h2 {
+    font-size: 1.4rem;
+  }
+  .closing-cta p {
+    font-size: 0.85rem;
+  }
+  .closing-cta .button {
+    font-size: 0.875rem;
+  }
+  .landing-disclosure .disclosure {
+    font-size: 0.7rem;
+  }
+  .coach-page-top {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+  .educational-pill {
+    font-size: 0.65rem;
+  }
+  .coach-heading {
+    margin-block: 22px;
+  }
+  .coach-heading h1 {
+    font-size: 2rem;
+  }
+  .coach-heading .eyebrow {
+    font-size: 0.65rem;
+  }
+  .coach-heading p {
+    font-size: 0.9rem;
+    max-width: none;
+  }
+  .coach-heading-decoration {
+    display: none;
+  }
+  .coach-section-nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0;
+  }
+  .coach-section-nav a {
+    font-size: 0.75rem;
+    padding-inline: 10px;
+  }
+  .coach-preferences,
+  .simulator {
+    padding: 23px;
+    border-radius: 16px;
+  }
+  .preferences-heading h2 {
+    font-size: 1.3rem;
+  }
+  .question-panel h3 {
+    font-size: 1.1rem;
+  }
+  .coach-preferences .question-control {
+    padding: 20px;
+  }
+  .monthly-display {
+    font-size: 2.3rem;
+  }
+  .monthly-display span {
+    font-size: 0.8rem;
+  }
+  .amount-chips button {
+    min-height: 40px;
+    font-size: 0.8rem;
+  }
+  .choice-stack strong {
+    font-size: 0.95rem;
+  }
+  .choice-stack small {
+    font-size: 0.8rem;
+  }
+  .question-control .button {
+    font-size: 0.85rem;
+  }
+  .question-control .fine-print {
+    font-size: 0.7rem;
+  }
+  .slider-labels {
+    font-size: 0.7rem;
+  }
+  .chat-header {
+    padding: 20px;
+  }
+  .chat-header h2 {
+    font-size: 1rem;
+  }
+  .chat-header > div > span {
+    font-size: 0.7rem;
+  }
+  .chat-body {
+    padding: 20px 16px;
+  }
+  .chat-welcome p,
+  .message-bubble {
+    font-size: 0.95rem;
+  }
+  .chat-welcome {
+    gap: 8px;
+  }
+  .message-avatar {
+    width: 26px;
+    height: 26px;
+  }
+  .message-bubble {
+    padding: 13px;
+  }
+  .message.user {
+    margin-left: 20px;
+  }
+  .message {
+    gap: 7px;
+  }
+  .chat-starters {
+    margin-left: 0;
+    margin-top: 22px;
+  }
+  .chat-starters > button {
+    padding: 15px;
+    gap: 10px;
+  }
+  .chat-starters strong {
+    font-size: 0.85rem;
+  }
+  .chat-starters small {
+    font-size: 0.75rem;
+  }
+  .chat-starters > button > svg:last-child {
+    width: 16px;
+  }
+  .chat-composer-area {
+    padding: 15px;
+  }
+  .quick-replies {
+    gap: 6px;
+  }
+  .quick-replies button {
+    font-size: 0.7rem;
+    padding: 8px 9px;
+  }
+  .chat-composer textarea {
+    font-size: 16px;
+    padding-inline: 6px;
+  }
+  .composer-note {
+    font-size: 0.65rem;
+  }
+  .typing {
+    font-size: 0.85rem;
+  }
+  .chat-fallback,
+  .chat-notice {
+    font-size: 0.75rem;
+  }
+  .projection-number {
+    font-size: 2.65rem;
+  }
+  .projection-caption {
+    font-size: 0.8rem;
+  }
+  .sim-tabs button {
+    font-size: 0.75rem;
+    padding-inline: 10px;
+  }
+  .section-topline .eyebrow {
+    font-size: 0.65rem;
+  }
+  .live-tag {
+    font-size: 0.6rem;
+  }
+  .projection-breakdown strong {
+    font-size: 1.35rem;
+  }
+  .projection-breakdown span {
+    font-size: 0.7rem;
+  }
+  .chart-wrap {
+    height: 250px;
+  }
+  .chart-legend > span {
+    font-size: 0.65rem;
+  }
+  .sim-assumptions > span,
+  .sim-assumptions .text-button {
+    font-size: 0.7rem;
+  }
+  .scenario-range {
+    font-size: 0.7rem;
+  }
+  .simulator > .fine-print {
+    font-size: 0.65rem;
+  }
+  .coach-aside-note p {
+    font-size: 0.8rem;
+  }
+  .coach-bottom-note {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+  }
+  .coach-bottom-note > a {
+    font-size: 0.75rem;
+  }
+  .mobile-sim-summary {
+    padding-inline: 20px;
+  }
+  .mobile-sim-summary > div > span {
+    font-size: 0.65rem;
+  }
+  .mobile-sim-summary strong {
+    font-size: 1.55rem;
+  }
+  .mobile-sim-summary > a {
+    font-size: 0.75rem;
+  }
+  .page-intro h1,
+  .onboarding-grid .page-intro h1 {
+    font-size: 2.1rem;
+  }
+  .page-intro > p {
+    font-size: 0.95rem;
+  }
+  .onboarding-option {
+    padding: 23px 18px;
+    gap: 12px;
+  }
+  .onboarding-option h2 {
+    font-size: 1.1rem;
+  }
+  .onboarding-option p {
+    font-size: 0.85rem;
+  }
+  .onboarding-option div > span {
+    font-size: 0.8rem;
+  }
+  .journey-summary {
+    padding: 28px;
+  }
+  .journey-summary h2 {
+    font-size: 2rem;
+  }
+  .form-card,
+  .plan-review {
+    padding: 25px;
+  }
+  .identity-note {
+    font-size: 0.75rem;
+  }
+  .checkbox-label,
+  .plan-review .checkbox-label {
+    font-size: 0.85rem;
+  }
+  .investment-summary-bar {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 12px;
+  }
+  .investment-summary-bar strong {
+    font-size: 0.9rem;
+  }
+  .investment-summary-bar > div > span:last-child {
+    font-size: 0.7rem;
+  }
+  .investment-summary-bar > a {
+    font-size: 0.75rem;
+  }
+  .investment-summary-bar .icon-tile {
+    display: none;
+  }
+  .filter-tabs button {
+    padding: 9px;
+    font-size: 0.75rem;
+  }
+  .product-card {
+    padding: 26px;
+  }
+  .product-card h2 {
+    font-size: 1.8rem;
+  }
+  .product-description {
+    min-height: 0;
+    font-size: 0.95rem;
+  }
+  .product-numbers > div > span {
+    font-size: 0.7rem;
+  }
+  .product-card > .button {
+    font-size: 0.85rem;
+  }
+  .product-liquidity,
+  .allocation {
+    font-size: 0.75rem;
+  }
+  .risk-scale {
+    font-size: 0.75rem;
+  }
+  .investment-continue > div small {
+    font-size: 0.75rem;
+  }
+  .investment-continue > .button {
+    font-size: 0.85rem;
+  }
+  .plan-details dt {
+    font-size: 0.85rem;
+  }
+  .plan-details dd {
+    font-size: 1rem;
+  }
+  .plan-fund-header h2 {
+    font-size: 1.3rem;
+  }
+  .plan-fund-header > a {
+    font-size: 0.75rem;
+  }
+  .risk-notice p {
+    font-size: 0.85rem;
+  }
+  .plan-review > .button {
+    font-size: 0.85rem;
+  }
+  .success-heading h1 {
+    font-size: 2.1rem;
+  }
+  .success-heading > p {
+    font-size: 0.95rem;
+  }
+  .success-plan {
+    padding: 25px;
+  }
+  .success-plan h2 {
+    font-size: 1.5rem;
+  }
+  .success-metrics strong {
+    font-size: 1.9rem;
+  }
+  .success-metrics > div > span {
+    font-size: 0.75rem;
+  }
+  .next-cards h3 {
+    font-size: 1.2rem;
+  }
+  .next-cards p {
+    font-size: 0.95rem;
+  }
+  .dialog-content {
+    padding: 30px 24px;
+  }
+  .detail-list > div {
+    font-size: 0.8rem;
+  }
+  .dialog-title {
+    font-size: 1.6rem;
+  }
+  .footer {
+    padding-block: 28px;
+  }
+  .footer p {
+    font-size: 0.65rem;
+  }
+  .footer-links {
+    font-size: 0.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .typing-dots i,
+  .stream-caret {
+    animation: none;
+  }
+}
+
+@media (min-width: 1100px) and (max-width: 1439px) {
+  .preferences-heading {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .preferences-heading .chat-header-step {
+    white-space: nowrap;
+  }
+  .preferences-heading h2 {
+    font-size: 1.25rem;
+  }
+}

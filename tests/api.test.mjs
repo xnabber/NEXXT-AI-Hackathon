@@ -19,15 +19,152 @@ async function start(options) {
   const url = `http://127.0.0.1:${server.address().port}`;
   return {
     get: (path) => fetch(url + path),
-    post: (body) =>
+    post: (body, headers = {}) =>
       fetch(url + "/api/coach", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...headers },
         body: JSON.stringify(body),
       }),
   };
 }
 describe("coach API", () => {
+  it("uses a normal Bedrock reply when the key lacks streaming permission", async () => {
+    const client = await start({
+      hasKey: () => true,
+      streamBedrock: async function* () {
+        throw Object.assign(new Error("Streaming not permitted"), {
+          $metadata: { httpStatusCode: 403 },
+        });
+      },
+      requestBedrock: async () => "A normal live answer.",
+    });
+    const response = await client.post(request, {
+      Accept: "application/x-ndjson",
+    });
+    const events = (await response.text())
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    expect(events).toContainEqual({
+      type: "delta",
+      text: "A normal live answer.",
+    });
+    expect(events.at(-1)).toEqual({ type: "done" });
+    expect(events.some((event) => event.type === "error")).toBe(false);
+  });
+  it("merges adjacent user turns after a reply was stopped before producing text", async () => {
+    let received;
+    const client = await start({
+      hasKey: () => true,
+      requestBedrock: async (messages) => {
+        received = messages;
+        return "A direct answer.";
+      },
+    });
+    await client.post({
+      ...request,
+      messages: [
+        { role: "user", text: "An earlier question" },
+        { role: "user", text: "My new question" },
+      ],
+    });
+    expect(received).toEqual([
+      { role: "user", text: "An earlier question\n\nMy new question" },
+    ]);
+  });
+  it("cancels provider work when the streaming client disconnects", async () => {
+    let markAborted;
+    const aborted = new Promise((resolve) => {
+      markAborted = resolve;
+    });
+    const client = await start({
+      hasKey: () => true,
+      streamBedrock: async function* (_messages, _context, { signal }) {
+        yield "A partial answer";
+        await new Promise((resolve) => {
+          if (signal.aborted) {
+            markAborted();
+            resolve();
+          } else
+            signal.addEventListener(
+              "abort",
+              () => {
+                markAborted();
+                resolve();
+              },
+              { once: true },
+            );
+        });
+      },
+    });
+    const response = await client.post(request, {
+      Accept: "application/x-ndjson",
+    });
+    const reader = response.body.getReader();
+    await reader.read();
+    await reader.cancel();
+    await aborted;
+  });
+
+  it("streams provider chunks in order and marks completion", async () => {
+    const client = await start({
+      hasKey: () => true,
+      streamBedrock: async function* () {
+        yield "A bond ";
+        yield "is a loan.";
+      },
+    });
+    const response = await client.post(request, {
+      Accept: "application/x-ndjson",
+    });
+    expect(response.headers.get("content-type")).toContain(
+      "application/x-ndjson",
+    );
+    const events = (await response.text())
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    expect(events).toEqual([
+      { type: "start", source: "bedrock" },
+      { type: "delta", text: "A bond " },
+      { type: "delta", text: "is a loan." },
+      { type: "done" },
+    ]);
+  });
+  it("reports a mid-stream failure without leaking raw provider errors", async () => {
+    const client = await start({
+      hasKey: () => true,
+      streamBedrock: async function* () {
+        yield "Partial reply";
+        throw Object.assign(new Error("private upstream content"), {
+          $metadata: { httpStatusCode: 429 },
+        });
+      },
+    });
+    const response = await client.post(request, {
+      Accept: "application/x-ndjson",
+    });
+    const text = await response.text();
+    expect(text).toContain("BEDROCK_THROTTLED");
+    expect(text).not.toContain("private upstream content");
+    expect(text).not.toContain('"type":"done"');
+  });
+  it("keeps the contextual guide available for streaming clients without a key", async () => {
+    const client = await start({ hasKey: () => false });
+    const response = await client.post(
+      {
+        ...request,
+        messages: [{ role: "user", text: "Explain my projection" }],
+        context: { monthly: 1000, years: 5, risk: "steady" },
+      },
+      { Accept: "application/x-ndjson" },
+    );
+    const body = await response.json();
+    expect(body.source).toBe("guided");
+    expect(body.text).toContain("1,000 lei");
+    expect(body.text).toContain("60,000 lei contributed");
+  });
+
   it("returns an honest educational guide when no key is configured", async () => {
     const client = await start({ hasKey: () => false });
     const response = await client.post(request);

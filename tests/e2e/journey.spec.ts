@@ -277,3 +277,66 @@ test("core pages pass automated accessibility checks", async ({ page }) => {
     })),
   ).toEqual([]);
 });
+
+test("streams an answer immediately and allows drafting and stopping", async ({
+  page,
+}) => {
+  // Run a delayed stream in the page's transport so the UI can be examined between chunks.
+  await page.goto("/coach");
+  await page.evaluate(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (input, init) => {
+      if (String(input) !== "/api/coach") return originalFetch(input, init);
+      let timer: ReturnType<typeof setTimeout>;
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(
+            encoder.encode(
+              '{"type":"start","source":"bedrock"}\n{"type":"delta","text":"A bond is a loan."}\n',
+            ),
+          );
+          timer = setTimeout(() => {
+            controller.enqueue(
+              encoder.encode(
+                '{"type":"delta","text":" It can pay interest."}\n{"type":"done"}\n',
+              ),
+            );
+            controller.close();
+          }, 10000);
+          init?.signal?.addEventListener(
+            "abort",
+            () => {
+              clearTimeout(timer);
+              controller.error(new DOMException("Stopped", "AbortError"));
+            },
+            { once: true },
+          );
+        },
+        cancel() {
+          clearTimeout(timer);
+        },
+      });
+      return new Response(stream, {
+        headers: { "Content-Type": "application/x-ndjson" },
+      });
+    };
+  });
+  const input = page.getByRole("textbox", {
+    name: "Ask your investment coach",
+  });
+  await input.fill("What is a bond?");
+  await input.press("Enter");
+  await expect(page.locator(".streaming-reply")).toContainText(
+    "A bond is a loan.",
+  );
+  await input.fill("What about shares?");
+  await expect(input).toHaveValue("What about shares?");
+  await page.getByRole("button", { name: "Stop response" }).click();
+  await expect(page.locator(".message-stopped")).toContainText(
+    "Response stopped",
+  );
+  await expect(input).toHaveValue("What about shares?");
+  await expect(page.locator(".chat-notice")).toContainText("Response stopped");
+  await expect(page.locator(".chat-fallback")).toHaveCount(0);
+});

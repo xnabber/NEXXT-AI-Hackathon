@@ -8,6 +8,8 @@ export type Message = {
   role: "user" | "assistant";
   text: string;
   source?: "guided" | "bedrock";
+  kind?: "setup";
+  status?: "stopped";
 };
 export type Journey = {
   monthly: number;
