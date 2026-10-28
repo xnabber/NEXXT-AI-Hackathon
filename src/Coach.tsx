@@ -48,12 +48,19 @@ export default function Coach() {
   const [unavailable, setUnavailable] = useState(false);
   const [live, setLive] = useState(false);
   const [chatError, setChatError] = useState("");
-  const chatEnd = useRef<HTMLDivElement>(null);
+  const chatBody = useRef<HTMLDivElement>(null);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
   useEffect(() => {
-    if (state.messages.length)
-      chatEnd.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const body = chatBody.current;
+    if (state.messages.length && body) {
+      body.scrollTo({
+        top: body.scrollHeight,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    }
   }, [state.messages.length, busy]);
   const addAnswer = (
     answer: string,
@@ -154,6 +161,152 @@ export default function Coach() {
         </span>
       </div>
       <div className="coach-grid">
+        <section
+          className="coach-preferences"
+          aria-labelledby="preferences-title"
+        >
+          <div className="preferences-heading">
+            <div>
+              <div className="eyebrow">YOUR SIMULATION</div>
+              <h2 id="preferences-title">Your starting point</h2>
+            </div>
+            <span className="chat-header-step">
+              {state.question < 3 ? (
+                `0${state.question + 1} / 03`
+              ) : (
+                <Check size={18} />
+              )}
+            </span>
+          </div>
+          {state.question !== 0 && (
+            <div className="monthly-adjustment">
+              <span className="monthly-adjustment-label">
+                Monthly investment
+              </span>
+              <MonthlyControl compact />
+            </div>
+          )}
+          {state.question < 3 ? (
+            <div className="question-panel">
+              <div className="question-label">
+                QUESTION {state.question + 1} OF 3
+              </div>
+              <h3>{questions[state.question]}</h3>
+              {state.question === 0 && (
+                <MonthlyControl
+                  onContinue={() =>
+                    addAnswer(
+                      `${money(state.monthly)} lei a month feels comfortable.`,
+                      `A thoughtful starting point. ${money(state.monthly)} lei a month adds up to ${money(state.monthly * 12)} lei in a year, before any returns. Keep your everyday needs and emergency savings covered first.`,
+                    )
+                  }
+                />
+              )}
+              {state.question === 1 && (
+                <div className="choice-stack">
+                  {[
+                    {
+                      y: 3,
+                      title: "In a few years",
+                      text: "Around 3 years · a nearer-term goal",
+                    },
+                    {
+                      y: 5,
+                      title: "A little further ahead",
+                      text: "Around 5 years · room to build a habit",
+                    },
+                    {
+                      y: 10,
+                      title: "I’m thinking long term",
+                      text: "10 years or more · a future me goal",
+                    },
+                  ].map((item) => (
+                    <button
+                      key={item.y}
+                      onClick={() =>
+                        addAnswer(
+                          `I’m thinking about ${item.y} years.`,
+                          `We’ll use ${item.y} years for your simulation. A longer horizon gives more time to ride out market movements, but returns are never guaranteed. Keep money for short-term needs readily accessible.`,
+                          { years: item.y },
+                        )
+                      }
+                    >
+                      <span>
+                        <strong>{item.title}</strong>
+                        <small>{item.text}</small>
+                      </span>
+                      <ArrowUpRight size={17} />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {state.question === 2 && (
+                <div className="choice-stack">
+                  {[
+                    {
+                      risk: "steady" as Risk,
+                      title: "I’d prefer a steadier ride",
+                      text: "I’m cautious about changes in value.",
+                    },
+                    {
+                      risk: "balanced" as Risk,
+                      title: "Some ups and downs are okay",
+                      text: "I want to understand the balance.",
+                    },
+                    {
+                      risk: "growth" as Risk,
+                      title: "I can take a longer view",
+                      text: "I understand bigger falls can happen.",
+                    },
+                  ].map((item) => (
+                    <button
+                      key={item.risk}
+                      onClick={() =>
+                        addAnswer(
+                          item.title,
+                          "Thanks for sharing. Your simulation is ready to explore. These three answers are a starting point for learning, not a suitability assessment or investment recommendation. You can change the numbers, ask me anything, or explore the example funds.",
+                          { risk: item.risk, productId: item.risk },
+                        )
+                      }
+                    >
+                      <span>
+                        <strong>{item.title}</strong>
+                        <small>{item.text}</small>
+                      </span>
+                      <ArrowUpRight size={17} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="conversation-complete">
+              <span className="complete-check">
+                <Check size={18} />
+              </span>
+              <div>
+                <h3>A little clearer already.</h3>
+                <p>
+                  Your {money(state.monthly)} lei/month, {state.years}-year
+                  scenario is saved.
+                </p>
+              </div>
+              <Button asChild>
+                <Link
+                  to={state.authenticated ? "/account/invest" : "/onboarding"}
+                >
+                  Explore my options <ArrowUpRight size={17} />
+                </Link>
+              </Button>
+              <button
+                className="text-button"
+                onClick={() => update({ question: 0 })}
+              >
+                Revisit my answers
+              </button>
+            </div>
+          )}
+        </section>
         <section className="chat-card" aria-labelledby="coach-chat-title">
           <div className="chat-header">
             <span className="coach-orb">
@@ -166,15 +319,8 @@ export default function Coach() {
                 {live ? "AI coach · here to help" : "Your educational guide"}
               </span>
             </div>
-            <span className="chat-header-step">
-              {state.question < 3 ? (
-                `0${state.question + 1} / 03`
-              ) : (
-                <Check size={18} />
-              )}
-            </span>
           </div>
-          <div className="chat-body">
+          <div className="chat-body" ref={chatBody}>
             <div className="chat-welcome">
               <span className="message-avatar">
                 <Sprout size={15} />
@@ -220,127 +366,6 @@ export default function Coach() {
                 </div>
               )}
             </div>
-            {state.question < 3 ? (
-              <div className="question-panel">
-                <div className="question-label">
-                  QUESTION {state.question + 1} OF 3
-                </div>
-                <h3>{questions[state.question]}</h3>
-                {state.question === 0 && (
-                  <MonthlyControl
-                    onContinue={() =>
-                      addAnswer(
-                        `${money(state.monthly)} lei a month feels comfortable.`,
-                        `A thoughtful starting point. ${money(state.monthly)} lei a month adds up to ${money(state.monthly * 12)} lei in a year, before any returns. Keep your everyday needs and emergency savings covered first.`,
-                      )
-                    }
-                  />
-                )}
-                {state.question === 1 && (
-                  <div className="choice-stack">
-                    {[
-                      {
-                        y: 3,
-                        title: "In a few years",
-                        text: "Around 3 years · a nearer-term goal",
-                      },
-                      {
-                        y: 5,
-                        title: "A little further ahead",
-                        text: "Around 5 years · room to build a habit",
-                      },
-                      {
-                        y: 10,
-                        title: "I’m thinking long term",
-                        text: "10 years or more · a future me goal",
-                      },
-                    ].map((item) => (
-                      <button
-                        key={item.y}
-                        onClick={() =>
-                          addAnswer(
-                            `I’m thinking about ${item.y} years.`,
-                            `We’ll use ${item.y} years for your simulation. A longer horizon gives more time to ride out market movements, but returns are never guaranteed. Keep money for short-term needs readily accessible.`,
-                            { years: item.y },
-                          )
-                        }
-                      >
-                        <span>
-                          <strong>{item.title}</strong>
-                          <small>{item.text}</small>
-                        </span>
-                        <ArrowUpRight size={17} />
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {state.question === 2 && (
-                  <div className="choice-stack">
-                    {[
-                      {
-                        risk: "steady" as Risk,
-                        title: "I’d prefer a steadier ride",
-                        text: "I’m cautious about changes in value.",
-                      },
-                      {
-                        risk: "balanced" as Risk,
-                        title: "Some ups and downs are okay",
-                        text: "I want to understand the balance.",
-                      },
-                      {
-                        risk: "growth" as Risk,
-                        title: "I can take a longer view",
-                        text: "I understand bigger falls can happen.",
-                      },
-                    ].map((item) => (
-                      <button
-                        key={item.risk}
-                        onClick={() =>
-                          addAnswer(
-                            item.title,
-                            "Thanks for sharing. Your simulation is ready to explore. These three answers are a starting point for learning, not a suitability assessment or investment recommendation. You can change the numbers, ask me anything, or explore the example funds.",
-                            { risk: item.risk, productId: item.risk },
-                          )
-                        }
-                      >
-                        <span>
-                          <strong>{item.title}</strong>
-                          <small>{item.text}</small>
-                        </span>
-                        <ArrowUpRight size={17} />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="conversation-complete">
-                <span className="complete-check">
-                  <Check size={18} />
-                </span>
-                <div>
-                  <h3>A little clearer already.</h3>
-                  <p>
-                    Your {money(state.monthly)} lei/month, {state.years}-year
-                    scenario is saved.
-                  </p>
-                </div>
-                <Button asChild>
-                  <Link
-                    to={state.authenticated ? "/account/invest" : "/onboarding"}
-                  >
-                    Explore my options <ArrowUpRight size={17} />
-                  </Link>
-                </Button>
-                <button
-                  className="text-button"
-                  onClick={() => update({ question: 0 })}
-                >
-                  Revisit my answers
-                </button>
-              </div>
-            )}
-            <div ref={chatEnd} />
           </div>
           <div className="chat-composer-area">
             <div className="quick-replies">
@@ -395,7 +420,7 @@ export default function Coach() {
           </div>
         </section>
         <aside className="simulator-column">
-          <Simulator />
+          <Simulator monthlyControl={false} />
           <div className="coach-aside-note">
             <span className="icon-tile">
               <MessageCircle size={18} />

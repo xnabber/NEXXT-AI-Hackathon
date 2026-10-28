@@ -4593,3 +4593,101 @@ html {
     padding-bottom: 115px;
   }
 }
+
+/* Keep the conversation and simulation inputs in independent panels. */
+.coach-grid {
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr);
+  grid-template-areas: "conversation preferences" "conversation projection";
+  grid-template-rows: auto 1fr;
+}
+.coach-grid > .chat-card {
+  grid-area: conversation;
+  position: sticky;
+  top: 24px;
+  min-width: 0;
+}
+.coach-preferences {
+  grid-area: preferences;
+  min-width: 0;
+  padding: 23px 25px;
+  border: 1px solid #e0e7d3;
+  border-radius: 13px;
+  background: #fcfdf9;
+}
+.preferences-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.preferences-heading .eyebrow {
+  font-size: 9px;
+}
+.preferences-heading h2 {
+  margin-top: 7px;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+.preferences-heading .chat-header-step {
+  font-size: 11px;
+  color: #667450;
+}
+.coach-preferences .question-panel {
+  margin: 21px 0 0;
+}
+.coach-preferences .question-control {
+  background: #fff;
+}
+.coach-preferences .conversation-complete {
+  margin-top: 22px;
+}
+.monthly-adjustment {
+  margin-top: 20px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid #e5ebd8;
+}
+.monthly-adjustment-label {
+  color: #657450;
+  font-size: 11px;
+}
+.question-control.compact {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.question-control.compact .monthly-display {
+  font-size: 26px;
+  margin-bottom: 12px;
+}
+.question-control.compact .amount-chips {
+  margin-block: 12px 17px;
+}
+.coach-grid > .simulator-column {
+  grid-area: projection;
+  min-width: 0;
+}
+@media (max-width: 980px) and (min-width: 721px) {
+  .coach-preferences {
+    padding: 19px;
+  }
+}
+@media (max-width: 720px) {
+  .coach-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "preferences" "conversation" "projection";
+    grid-template-rows: auto;
+  }
+  .coach-grid > .chat-card {
+    position: static;
+  }
+  .coach-preferences {
+    padding: 23px;
+  }
+  .coach-preferences .question-control {
+    padding: 18px;
+  }
+  .coach-preferences .question-control.compact {
+    padding: 0;
+  }
+}

@@ -21,9 +21,13 @@ async function noOverflow(page: Page) {
 }
 async function finishQuestions(page: Page, years = 5) {
   await page.goto("/coach");
+  await expect(page.locator(".chat-card").getByRole("slider")).toHaveCount(0);
+  await expect(
+    page.getByRole("slider", { name: "Monthly investment" }),
+  ).toHaveCount(1);
   await page
+    .getByRole("region", { name: "Your starting point" })
     .getByRole("slider", { name: "Monthly investment" })
-    .first()
     .focus();
   for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
   await page.getByRole("button", { name: "That feels comfortable" }).click();
@@ -38,6 +42,14 @@ async function finishQuestions(page: Page, years = 5) {
   await expect(
     page.getByRole("heading", { name: "A little clearer already." }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("slider", { name: "Monthly investment" }),
+  ).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("region", { name: "Your starting point" })
+      .getByRole("slider"),
+  ).toHaveAttribute("aria-valuenow", "750");
 }
 async function demoLogin(page: Page) {
   await page.goto("/onboarding/login");
@@ -206,9 +218,13 @@ test("changing the scenario requires reviewing a new demo activation", async ({
     .click();
   await expect(page).toHaveURL(/\/account\/success$/);
   await page.goto("/coach");
+  await expect(page.locator(".chat-card").getByRole("slider")).toHaveCount(0);
+  await expect(
+    page.getByRole("slider", { name: "Monthly investment" }),
+  ).toHaveCount(1);
   await page
+    .getByRole("region", { name: "Your starting point" })
     .getByRole("slider", { name: "Monthly investment" })
-    .first()
     .focus();
   await page.keyboard.press("ArrowRight");
   await page.goto("/account/success");
