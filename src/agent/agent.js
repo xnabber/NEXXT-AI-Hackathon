@@ -6,6 +6,7 @@ async function agentTurn(store,session,userText,options={}){
  const config={...settings(),...options.config},provider=Object.hasOwn(options,'provider')?options.provider:createProvider(config),text=clean(userText);
  if(!text||text.length>1200)return{error:{code:'INVALID_MESSAGE',message:'Use a message within the allowed length.'}};
  const started=performance.now(),trace=[],usage={inputTokens:0,outputTokens:0,totalTokens:0,estimatedCostUSD:0},notify=options.onEvent||(()=>{});
+ if(/\b(vreau|buget|bani|economii|comisioane|chirie|venitul|depozite)\b|[ăâîșț]/i.test(text))session.language='ro';
  session.turnSequence=(session.turnSequence||0)+1;session.lastUserText=text;const change=changeFromText(text,store.profile(session),session.memory);if(change?.type==='goal'){session.pendingHorizon=change.horizonYears;session.revision++;}
  session.messages.push({role:'user',text});session.messages=session.messages.slice(-12);
  const blocked=rejection(text,session);let mode='offline',answer,reason=blocked||null;

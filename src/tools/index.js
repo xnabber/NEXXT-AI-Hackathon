@@ -20,7 +20,7 @@ function valid(spec,value){
  if(spec.type==='string')return typeof value==='string'&&value.trim().length>=(spec.minLength||0)&&value.length<=(spec.maxLength||Infinity)&&!/[\u0000-\u001f\u007f]/.test(value);
  if(spec.type==='boolean')return typeof value==='boolean';if(spec.type==='integer'||spec.type==='number')return typeof value==='number'&&Number.isFinite(value)&&(spec.type!=='integer'||Number.isInteger(value))&&value>=spec.minimum&&value<=spec.maximum;return false;
 }
-function inferRisk(text){const value=String(text||'').toLowerCase();if(/steady|cautious|cautios|prudent|conservator/.test(value))return 'steady';if(/balanced|balance|moderate|moderat|echilibrat|some ups/.test(value))return 'balanced';if(/growth|aggressive|agresiv|accept.*risk|risc ridicat/.test(value))return 'growth';return null;}
+function inferRisk(text){const value=String(text||'').toLowerCase();if(/steady|cautious|cautios|prudent|conservator/.test(value))return 'steady';if(/balanced|moderate|moderat|echilibrat|some ups/.test(value))return 'balanced';if(/growth|aggressive|agresiv|accept.*risk|risc ridicat/.test(value))return 'growth';return null;}
 function executeTool(store,session,name,input={},notify=()=>{}){
  const start=performance.now();const spec=definitions.find(d=>d.name===name);let output;
  try{
@@ -56,7 +56,7 @@ function run(store,session,name,input){
   if(!requested||requested.type!==input.change.type||(requested.type==='goal'?requested.horizonYears!==input.change.horizonYears:requested.amount!==input.change.amount))return failure('EXPLICIT_CHANGE_REQUIRED','Only apply the change the customer actually requested.');
   const before=capacity(profile,memory),oldHorizon=memory.horizonYears,change=input.change;
   if(change.type==='goal'&&session.pendingHorizon&&change.horizonYears!==session.pendingHorizon)return failure('EXPLICIT_CHANGE_REQUIRED','Use the horizon the customer requested.');
-  if(change.type==='goal'){delete session.pendingHorizon;memory.goal=safeLabel(change.goal);memory.horizonYears=change.horizonYears;memory.needsLiquidity=change.needsLiquidity??true;}
+  if(change.type==='goal'){delete session.pendingHorizon;memory.goal=safeLabel(change.goal);memory.horizonYears=change.horizonYears;memory.needsLiquidity=requested.needsLiquidity??true;}
   if(change.type==='bonus')memory.bonus+=change.amount;if(change.type==='rent')memory.rentDelta+=change.amount;
   session.revision++;const after=capacity(profile,memory);const diff={safeMonthly:after.safeMonthly-before.safeMonthly,idleCash:after.idleCash-before.idleCash,horizonYears:memory.horizonYears-oldHorizon};
   const output={change,before,after,diff,goal:memory.goal,horizonYears:memory.horizonYears,ui:{type:'change',change,before,after,diff,goal:memory.goal,horizonYears:memory.horizonYears}};session.lastChange={key,output,turn:session.turnSequence||0,customer:session.customerId};return output;
