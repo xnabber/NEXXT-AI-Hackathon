@@ -136,3 +136,11 @@ Get "https://api.github.com/repos/xnabber/NEXXT-AI-Hackathon": Forbidden
 The current enforced network policy allows the Bedrock endpoint and GitHub Git destinations, but not `api.github.com`. The saved environment draft adds `api.github.com`, `api.anthropic.com` and `api.openai.com` while preserving the existing Bedrock destination. Saving is not applying or publishing. The requested draft PR cannot be claimed created while that API operation is denied. The prepared PR description is [PULL_REQUEST.md](docs/PULL_REQUEST.md); compare `main...agent-upgrade` in GitHub, or review/save/publish the network draft and resume PR creation. No token is requested and proxy-held credentials were not extracted.
 
 The reusable install script and startup instructions were also saved and tested: existing checkout, Node 20+, `npm ci`, `npm test`, one `npm start`/watch server on port 5173, local functional readiness checks, preserved `.env`, existing Bedrock binding and proxy/CA trust. The environment is validated in this machine; fresh-task restoration/publication is not claimed. No unsupported cloud localhost preview was published.
+
+Final publication check: `agent-upgrade` was pushed successfully and its remote HEAD matched local commit `64ecf7b2261c0129499e314fcc875e668de2b7e1` before this final status note. Remote main remained `eacb0404478ae1f761072d5ef72b5c33e68da156`. The requested creation command was attempted with `--draft --base main --head agent-upgrade --body-file docs/PULL_REQUEST.md` and failed with:
+
+```text
+Post "https://api.github.com/graphql": Forbidden
+```
+
+No PR was created or merged. [Review the pushed branch comparison](https://github.com/xnabber/NEXXT-AI-Hackathon/compare/main...agent-upgrade). The PR body is ready in `docs/PULL_REQUEST.md`; after enabling the saved API destination, rerun the documented draft creation command.
