@@ -8,6 +8,7 @@ function createApp(options={}){
  const store=options.store||new MemoryStore(),config={...settings(),...options.config},limits=new Map();
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
  function sessionFor(req,res){const id=req.headers.cookie?.match(/(?:^|;\s*)agent_session=([a-f0-9-]{36})(?:;|$)/)?.[1];let session=store.sessions.get(id);if(!session){session=store.createSession();res.setHeader('Set-Cookie',`agent_session=${session.id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=86400`);}return session;}
+ function demoAccess(session){const memory={...session.memory},messages=session.messages.slice(-12);store.selectPersona(session,'ioana');if(memory.explicit)session.memory={...session.memory,...memory};session.messages=messages;}
  function bootstrap(session){return{demo:config.demo,providerConfigured:Boolean(createProvider(config)),provider:config.provider,limits:{monthlyMin:100,monthlyMax:2000,monthlyStep:50,years:[1,2,3,5,7,10,15,20],inflation:.055,expiryMinutes:10},intro:{amount:10000,years:5,inflation:.055,purchasingPower:purchasingPower(10000,5)},personas:config.demo?Object.values(personas).map(p=>({id:p.id,name:p.name,segment:p.segment,incomePattern:p.incomePattern,prompt:p.prompt})):[],products,session:{authenticated:session.authenticated,personaId:session.customerId,name:store.profile(session)?.name||'Demo visitor',language:session.language,memory:session.memory,messages:session.messages,stage:session.onboardingStage||'profile',otpAttempts:session.otpAttempts},result:session.lastResult||null,plans:[...store.plans.values()].filter(p=>p.owner===session.id&&p.customer===session.customerId).map(publicProposal)};}
  async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>32768)throw Object.assign(new Error('Request too large'),{status:413});}try{const parsed=text?JSON.parse(text):{};if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw new Error('Object required');return parsed;}catch{throw Object.assign(new Error('Invalid JSON'),{status:400});}}
  function allowAdmin(req){if(config.demo)return true;const value=req.headers['x-admin-token']||'',expected=process.env.ADMIN_TOKEN||'';return expected&&value.length===expected.length&&crypto.timingSafeEqual(Buffer.from(value),Buffer.from(expected));}
@@ -63,7 +64,7 @@ function createApp(options={}){
     const confirmation=url.pathname.match(/^\/api\/proposals\/([a-f0-9-]+)\/confirm$/);
     if(req.method==='POST'&&confirmation){const input=await body(req);if(Object.keys(input).some(k=>k!=='confirm'))return send(res,400,{error:{code:'IMMUTABLE_PROPOSAL'}});const result=confirmProposal(store,session,confirmation[1],input.confirm);return send(res,result.error?422:200,result);}
     if(req.method==='POST'&&url.pathname==='/api/auth/login'){
-     const input=await body(req);if(input.demo!==true)return send(res,400,{error:{code:'DEMO_ACK_REQUIRED'}});const before={...session.memory};store.selectPersona(session,'ioana');if(before.explicit)session.memory={...session.memory,...before};store.record(session,'login');return send(res,200,bootstrap(session));
+     const input=await body(req);if(input.demo!==true)return send(res,400,{error:{code:'DEMO_ACK_REQUIRED'}});demoAccess(session);store.record(session,'login');return send(res,200,bootstrap(session));
     }
     if(req.method==='POST'&&url.pathname==='/api/onboarding'){
      const input=await body(req),stage=session.onboardingStage||'profile';
@@ -72,7 +73,7 @@ function createApp(options={}){
      else if(stage==='otp'&&input.step==='otp'){
       if(session.otpAttempts>=3)return send(res,429,{error:{code:'OTP_LOCKED'}});session.otpAttempts++;
       if(input.code!=='123456')return send(res,422,{error:{code:'OTP_INVALID',attemptsRemaining:3-session.otpAttempts}});session.otpVerified=true;session.onboardingStage='review';
-     }else if(stage==='review'&&input.step==='complete'&&session.otpVerified&&input.demo===true){const before={...session.memory};store.selectPersona(session,'ioana');if(before.explicit)session.memory={...session.memory,...before};session.onboardingStage='complete';store.record(session,'signup_completed');}
+     }else if(stage==='review'&&input.step==='complete'&&session.otpVerified&&input.demo===true){demoAccess(session);session.onboardingStage='complete';store.record(session,'signup_completed');}
      else return send(res,409,{error:{code:'ONBOARDING_ORDER'}});return send(res,200,bootstrap(session));
     }
     if(req.method==='GET'&&url.pathname==='/api/admin'){if(!allowAdmin(req))return send(res,403,{error:{code:'ADMIN_REQUIRED'}});const turns=store.audit.filter(e=>e.type==='turn');return send(res,200,{events:store.audit,metrics:metrics(store),turns:turns.length,plans:store.plans.size,proposals:store.proposals.size});}

@@ -30,6 +30,7 @@ async function agentTurn(store,session,userText,options={}){
  session.messages.push({role:'user',text});session.messages=session.messages.slice(-12);
  const blocked=rejection(text,session);let mode='offline',answer,reason=blocked||null;
  const event=e=>{trace.push(e);notify({type:'tool',...e});};
+ if(!blocked&&!session.customerId){if(change?.type==='goal'&&change.horizonYears>=.25&&change.horizonYears<=50){Object.assign(session.memory,{goal:change.goal,horizonYears:change.horizonYears,needsLiquidity:true,explicit:true});delete session.pendingHorizon;}const risk=inferRisk(text);if(risk){executeTool(store,session,'set_risk_profile',{answer:risk},event);session.memory.explicit=true;}}
  if(provider&&!blocked){
   const controller=new AbortController();let timer,onAbort;const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('TURN_TIMEOUT'));},config.timeoutMs);});
   const cancelled=new Promise((_,reject)=>{onAbort=()=>{controller.abort();reject(new Error('TURN_ABORTED'));};if(options.signal?.aborted)onAbort();else options.signal?.addEventListener('abort',onAbort,{once:true});});
