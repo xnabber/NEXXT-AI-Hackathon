@@ -1,14 +1,14 @@
 'use strict';
 require('./src/config.js').loadEnv();
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const {MemoryStore}=require('./src/store.js');const {agentTurn}=require('./src/agent/agent.js');const {createProvider}=require('./src/agent/provider.js');const {executeTool,inferRisk}=require('./src/tools/index.js');const {confirmProposal,publicProposal}=require('./src/bank.js');const {personas}=require('./src/data/index.js');const {products}=require('./src/products.js');const {purchasingPower}=require('./src/engine.js');const {settings}=require('./src/config.js');
+const {MemoryStore}=require('./src/store.js');const {agentTurn}=require('./src/agent/agent.js');const {createProvider}=require('./src/agent/provider.js');const {executeTool,inferRisk}=require('./src/tools/index.js');const {confirmProposal,publicProposal}=require('./src/bank.js');const {personas}=require('./src/data/index.js');const {products}=require('./src/products.js');const {purchasingPower}=require('./src/engine.js');const {settings}=require('./src/config.js');const {clean}=require('./src/agent/intent.js');
 const ROOT=path.join(__dirname,'public');
 function createApp(options={}){
  const store=options.store||new MemoryStore(),config={...settings(),...options.config},limits=new Map();
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
  function sessionFor(req,res){const id=req.headers.cookie?.match(/(?:^|;\s*)agent_session=([a-f0-9-]{36})(?:;|$)/)?.[1];let session=store.sessions.get(id);if(!session){session=store.createSession();res.setHeader('Set-Cookie',`agent_session=${session.id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=86400`);}return session;}
  function bootstrap(session){return{demo:config.demo,providerConfigured:Boolean(createProvider(config)),provider:config.provider,limits:{monthlyMin:100,monthlyMax:2000,monthlyStep:50,years:[1,2,3,5,7,10,15,20],inflation:.055,expiryMinutes:10},intro:{amount:10000,years:5,inflation:.055,purchasingPower:purchasingPower(10000,5)},personas:config.demo?Object.values(personas).map(p=>({id:p.id,name:p.name,segment:p.segment,incomePattern:p.incomePattern,prompt:p.prompt})):[],products,session:{authenticated:session.authenticated,personaId:session.customerId,name:store.profile(session)?.name||'Demo visitor',language:session.language,memory:session.memory,messages:session.messages,stage:session.onboardingStage||'profile',otpAttempts:session.otpAttempts},result:session.lastResult||null,plans:[...store.plans.values()].filter(p=>p.owner===session.id&&p.customer===session.customerId).map(publicProposal)};}
- async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>32768)throw Object.assign(new Error('Request too large'),{status:413});}try{return text?JSON.parse(text):{};}catch{throw Object.assign(new Error('Invalid JSON'),{status:400});}}
+ async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>32768)throw Object.assign(new Error('Request too large'),{status:413});}try{const parsed=text?JSON.parse(text):{};if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw new Error('Object required');return parsed;}catch{throw Object.assign(new Error('Invalid JSON'),{status:400});}}
  function allowAdmin(req){if(config.demo)return true;const value=req.headers['x-admin-token']||'',expected=process.env.ADMIN_TOKEN||'';return expected&&value.length===expected.length&&crypto.timingSafeEqual(Buffer.from(value),Buffer.from(expected));}
  const server=http.createServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
@@ -28,28 +28,33 @@ function createApp(options={}){
     if(req.method==='POST'&&url.pathname==='/api/reset'){const fresh=store.createSession();fresh.language=session.language;res.setHeader('Set-Cookie',`agent_session=${fresh.id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=86400`);return send(res,200,bootstrap(fresh));}
     if(req.method==='POST'&&url.pathname==='/api/events'){const input=await body(req);if(['visit','coach_started','onboarding_started','product_selected','review_started'].includes(input.event))store.record(session,input.event);return send(res,200,{ok:true});}
     if(req.method==='POST'&&url.pathname==='/api/scenario'){
+     if(session.activeTurn)return send(res,409,{error:{code:'TURN_IN_PROGRESS'}});
      const input=await body(req),allowed=['monthly','horizonYears','riskComfort','needsLiquidity'];if(Object.keys(input).some(k=>!allowed.includes(k)))return send(res,400,{error:{code:'INVALID_SCENARIO'}});
      if(input.monthly!==undefined&&(!Number.isInteger(input.monthly)||input.monthly<100||input.monthly>2000||input.monthly%50))return send(res,400,{error:{code:'INVALID_AMOUNT'}});
      if(input.horizonYears!==undefined&&![1,2,3,5,7,10,15,20].includes(input.horizonYears))return send(res,400,{error:{code:'INVALID_HORIZON'}});
      if(input.riskComfort!==undefined&&!['steady','balanced','growth'].includes(input.riskComfort))return send(res,400,{error:{code:'INVALID_RISK'}});
+     if(input.needsLiquidity!==undefined&&typeof input.needsLiquidity!=='boolean')return send(res,400,{error:{code:'INVALID_LIQUIDITY'}});
      for(const key of ['monthly','horizonYears'])if(input[key]!==undefined)session.memory[key]=input[key];
      if(input.needsLiquidity!==undefined){if(typeof input.needsLiquidity!=='boolean')return send(res,400,{error:{code:'INVALID_LIQUIDITY'}});session.memory.needsLiquidity=input.needsLiquidity;}
      if(input.riskComfort){session.lastUserText=input.riskComfort;executeTool(store,session,'set_risk_profile',{answer:input.riskComfort});}
-     session.memory.explicit=true;session.revision++;return send(res,200,bootstrap(session));
+     session.memory.explicit=true;session.revision++;session.lastResult=null;return send(res,200,bootstrap(session));
     }
     if(req.method==='POST'&&['/api/agent','/api/coach','/api/chat'].includes(url.pathname)){
-     const input=await body(req),text=input.message||input.messages?.filter(m=>m.role==='user').at(-1)?.text;
+     const input=await body(req),raw=input.message||(Array.isArray(input.messages)?input.messages.filter(m=>m?.role==='user').at(-1)?.text:null),text=typeof raw==='string'?clean(raw):'';
      if(typeof text!=='string'||!text.trim()||text.length>1200)return send(res,400,{error:{code:'INVALID_MESSAGE'}});
+     if(session.activeTurn)return send(res,409,{error:{code:'TURN_IN_PROGRESS'}});
      const now=store.now();for(const[key,value]of limits)if(value.until<now)limits.delete(key);const current=limits.get(session.id)||{count:0,until:now+60000};if(++current.count>30)return send(res,429,{error:{code:'RATE_LIMIT',message:'Please wait a moment before asking again.'}});limits.set(session.id,current);
-     const opts={config,...(Object.hasOwn(options,'provider')?{provider:options.provider}: {})};
-     if(req.headers.accept?.includes('text/event-stream')){
+     const controller=new AbortController(),onClose=()=>{if(!res.writableEnded)controller.abort();};res.on('close',onClose);session.activeTurn=true;
+     const opts={signal:controller.signal,config,...(Object.hasOwn(options,'provider')?{provider:options.provider}: {})};
+     try{if(req.headers.accept?.includes('text/event-stream')){
       res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache, no-transform','X-Accel-Buffering':'no','Connection':'keep-alive'});res.write(': connected\n\n');
       opts.onEvent=event=>{if(!res.destroyed)res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`);};
-      const result=await agentTurn(store,session,text,opts);session.lastResult=result;if(!res.destroyed)res.end();return;
+      const result=await agentTurn(store,session,text,opts);if(!result.cancelled)session.lastResult=result;if(!res.destroyed)res.end();return;
      }
-     const result=await agentTurn(store,session,text,opts);session.lastResult=result;
+     const result=await agentTurn(store,session,text,opts);if(!result.cancelled)session.lastResult=result;
      if(url.pathname!=='/api/agent')return send(res,200,{...result,text:result.messages?.[0]?.text,source:result.mode==='agent'?(result.provider==='bedrock'?'bedrock':'agent'):'guided'});
      return send(res,200,result);
+     }finally{session.activeTurn=false;res.removeListener('close',onClose);}
     }
     if(req.method==='POST'&&url.pathname==='/api/simulate'){const input=await body(req);const result=executeTool(store,session,'simulate',input).output;return send(res,result.error?400:200,result);}
     if(req.method==='GET'&&url.pathname==='/api/products'){const result=executeTool(store,session,'compare_products',{}).output;return send(res,result.error?401:200,result);}

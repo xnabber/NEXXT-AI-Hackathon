@@ -3,7 +3,7 @@ function clean(text){return String(text||'').replace(/[\u0000-\u001f\u007f]/g,''
 function rejection(text,session){
  const q=text.toLowerCase();
  if(/ignore.{0,30}(instructions|rules|previous)|system prompt|override.{0,20}rules|reveal.{0,30}(secret|key)|confirm.{0,25}without|call.{0,20}confirm.*endpoint/i.test(q))return 'injection';
- if(/other customer|another customer|someone else|altui client|alte? conturi|cross.customer/i.test(q)||['ioana','andrei','mihai','elena'].some(id=>id!==session.customerId&&new RegExp(`(?:show|read|access|datele|arată|arata).{0,35}${id}`,'i').test(q)))return 'cross_customer';
+ if(/other customer|another customer|someone else|altui client|alte? conturi|cross.customer/i.test(q)||['ioana','andrei','mihai','elena'].some(id=>id!==session.customerId&&new RegExp(`(?:show|read|access|compare|analyse|analyze|fetch|datele|arată|arata|compară|compara).{0,35}${id}`,'i').test(q)))return 'cross_customer';
  if(/guarantee|garantat|garanteaz|everything.{0,20}(stocks|shares)|all.{0,15}emergency|invest.{0,20}emergency fund|toți.{0,15}acțiuni|tot.{0,15}fondul.*urgen/i.test(q))return 'unsafe_request';
  if(/legal advice|tax advice|evade tax|evaziune|sfat fiscal|sfat juridic/i.test(q))return 'adviser';
  if(!/invest|save|saving|money|cash|budget|buffer|fund|bond|stock|fee|risk|return|income|salary|spend|plan|compare|start|begin|help|hello|^hi\b|bonus|rent|car|year|steady|balanced|growth|tax|payroll|deposit|why|how|what|thanks|credit|bani|econom|buget|fond|risc|chirie|mașin|masin|ani|încep|incep|salariu|depozit|comision|bună|buna|moderat|echilibrat|prudent|agresiv/i.test(q))return 'off_topic';return null;

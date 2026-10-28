@@ -45,7 +45,7 @@ function run(store,session,name,input){
   return{...baseline,productId:product.id,productName:product.name,stress,cash,ui:{type:'simulation',...baseline,productName:product.name,stressValue:stress.balance,cashValue:cash.balance}};
  }
  if(!profile||!session.authenticated)return{...failure('AUTH_REQUIRED','Choose a fictional persona or continue through demo account access.'),ui:{type:'auth',kind:'choice'}};
- if(name==='get_customer_profile'){const output={name:profile.name,ageBand:profile.age<25?'18–24':profile.age<35?'25–34':'35–49',segment:profile.segment,incomePattern:profile.incomePattern,goals:profile.goals.map(g=>({...g,name:safeLabel(g.name)})),asOf:profile.asOf,synthetic:true};return{...output,ui:{type:'profile',...output}};}
+ if(name==='get_customer_profile'){const output={name:safeLabel(profile.name),ageBand:profile.age<25?'18–24':profile.age<35?'25–34':'35–49',segment:profile.segment,incomePattern:profile.incomePattern,goals:profile.goals.map(g=>({...g,name:safeLabel(g.name)})),asOf:profile.asOf,synthetic:true};return{...output,ui:{type:'profile',...output}};}
  if(name==='get_spending_summary'){const result=spending(profile,input.months||12);return{...result,ui:{type:'budget',...result}};}
  if(name==='find_savings_capacity'){const result=capacity(profile,memory);return{...result,ui:{type:'capacity',...result}};}
  if(name==='compare_products'){const result=compare(profile,memory,input);return{...result,ui:{type:'compare',...result}};}
