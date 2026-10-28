@@ -24,20 +24,33 @@ The production server serves both the built app and API on port **3001** (or `PO
 
 ## Amazon Bedrock
 
-The server supports a Bedrock API key through the environment. The browser never receives the key. Configure these values in cloud environment settings:
+The server supports a Bedrock API key through the environment. The browser never receives the key. Cloud environment secrets do **not** transfer to a GitHub clone on your computer.
+
+### Test on your computer
+
+1. Pull the latest `codex/ai-investment-coach` branch and use Node.js 24+.
+2. Copy `.env.example` to `.env` in the project root (macOS/Linux: `cp .env.example .env`; PowerShell: `Copy-Item .env.example .env`).
+3. Edit `.env` locally and fill in `AWS_BEARER_TOKEN_BEDROCK` with your actual **Bedrock API key**. An AWS access-key ID, secret-access key, or cloud proxy placeholder is not a Bedrock bearer API key. Do not paste the key into chat or commit it.
+4. Keep `AWS_REGION=us-west-2` and `BEDROCK_MODEL_ID=us.amazon.nova-lite-v1:0`, or choose a Converse-compatible model/profile your key can access.
+5. Run `npm run bedrock:test`. It sends one short paid request and reports success or a safe diagnostic without printing the key. It does not require the app to be running.
+6. Start or restart `npm run dev` and use the chat on frontend port **5173**. This command starts both the frontend and API; running Vite alone does not start the API. Stop and restart after changing `.env`.
+
+`npm run dev`, `npm start`, and `npm run bedrock:test` automatically load `.env`. Existing process environment variables take precedence, so check for stale exported settings if edits appear to have no effect.
+
+Use the following server-side configuration locally or in cloud environment settings:
 
 | Variable                   | Purpose                                                                                                                                           |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AWS_BEARER_TOKEN_BEDROCK` | Secret Bedrock API key, delivered through the environment's supported secret binding.                                                             |
+| `AWS_BEARER_TOKEN_BEDROCK` | Secret Bedrock API key; enter it in your local ignored `.env` or use the cloud secret binding.                                                    |
 | `AWS_REGION`               | Defaults to `us-west-2`.                                                                                                                          |
 | `BEDROCK_MODEL_ID`         | Defaults to `us.amazon.nova-lite-v1:0`, an inference profile used with the Converse API. Choose an accessible compatible model/profile if needed. |
 | `PORT`                     | Optional backend port, default `3001`. For development, keep 3001 unless you also update the Vite proxy.                                          |
 
-The configured secret and network policy must permit **`bedrock-runtime.us-west-2.amazonaws.com`**. Changing region also requires updating the endpoint permission and secret destination in environment settings. `.env.example` documents configuration; the server inherits environment variables and does not automatically load `.env` files.
+The configured secret and network policy must permit **`bedrock-runtime.us-west-2.amazonaws.com`**. Changing region also requires updating the endpoint permission and secret destination in environment settings. The npm commands load the local `.env` file, while preserving any existing environment variables.
 
 The server retains the inherited HTTPS proxy and uses `AWS_CA_BUNDLE`, `SSL_CERT_FILE`, or `REQUESTS_CA_BUNDLE` to trust the managed environment CA. TLS verification remains enabled.
 
-`GET /api/health` reports whether a key is configured; it does not prove live model access. `POST /api/coach` validates conversation/context and invokes Bedrock server-side. With no key, it provides a labeled deterministic educational guide. If a configured live request fails or times out, the frontend explains that it is using the guide. No conversation or credential values are logged by the server.
+`GET /api/health` (on API port 3001, or through the frontend proxy) reports `guided-demo` without a key and `bedrock-configured` when one is present; it does not prove live model access. `POST /api/coach` validates conversation/context and invokes Bedrock server-side. With no key, it provides a labeled deterministic educational guide. If a configured live request fails or times out, the frontend explains that it is using the guide. The API and server terminal report safe diagnostics for rejected keys (401), denied access (403), model/request problems (400/404), rate limits (429), timeouts, and certificate failures. No raw upstream error messages, conversation content, or credential values are logged by the server.
 
 A live educational question was successfully answered using the configured `us-west-2` Bedrock endpoint and default Nova Lite inference profile during implementation. Live responses can still depend on key expiry, model permissions, service availability, and quotas.
 

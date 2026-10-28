@@ -24,6 +24,68 @@ function getDispatcher() {
     : new Agent({ connect: tls });
   return dispatcher;
 }
+export function getBedrockConfig() {
+  return {
+    region,
+    model,
+    keyConfigured: Boolean(process.env.AWS_BEARER_TOKEN_BEDROCK?.trim()),
+  };
+}
+export function describeBedrockError(error) {
+  const upstreamStatus = Number.isInteger(error?.status)
+    ? error.status
+    : undefined;
+  const connectionCode = error?.cause?.code || error?.code;
+  let code = "BEDROCK_CONNECTION_ERROR";
+  let message =
+    "Could not connect to Bedrock. Check your Internet connection, HTTPS proxy, region, and the server terminal.";
+  if (upstreamStatus === 401) {
+    code = "BEDROCK_AUTH_FAILED";
+    message =
+      "Bedrock rejected the API key. Check that AWS_BEARER_TOKEN_BEDROCK contains a valid, unexpired Bedrock API key.";
+  } else if (upstreamStatus === 403) {
+    code = "BEDROCK_ACCESS_DENIED";
+    message =
+      "Access to the Bedrock endpoint was denied. Check API-key validity and expiry, model permissions, AWS account requirements, and any network or proxy restrictions.";
+  } else if (upstreamStatus === 400 || upstreamStatus === 404) {
+    code = "BEDROCK_MODEL_ERROR";
+    message =
+      "Bedrock could not use this model or request. Check BEDROCK_MODEL_ID, Converse support, and AWS_REGION. Some models require an inference-profile ID.";
+  } else if (upstreamStatus === 429) {
+    code = "BEDROCK_THROTTLED";
+    message =
+      "Bedrock's rate or usage limit was reached. Wait and retry, or check the account's Bedrock quotas.";
+  } else if (upstreamStatus >= 500) {
+    code = "BEDROCK_UNAVAILABLE";
+    message = "Bedrock is temporarily unavailable. Try again shortly.";
+  } else if (
+    error?.name === "TimeoutError" ||
+    error?.name === "AbortError" ||
+    connectionCode === "UND_ERR_CONNECT_TIMEOUT"
+  ) {
+    code = "BEDROCK_TIMEOUT";
+    message =
+      "The Bedrock request timed out. Check connectivity and proxy settings, then retry.";
+  } else if (
+    [
+      "CERT_HAS_EXPIRED",
+      "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+      "SELF_SIGNED_CERT_IN_CHAIN",
+      "DEPTH_ZERO_SELF_SIGNED_CERT",
+      "UNABLE_TO_GET_ISSUER_CERT_LOCALLY",
+      "ERR_TLS_CERT_ALTNAME_INVALID",
+    ].includes(connectionCode)
+  ) {
+    code = "BEDROCK_TLS_ERROR";
+    message =
+      "The secure Bedrock connection could not be verified. Check your certificate trust settings; a corporate proxy may require a trusted CA bundle in AWS_CA_BUNDLE.";
+  }
+  return {
+    code,
+    error: message,
+    ...(upstreamStatus === undefined ? {} : { upstreamStatus }),
+  };
+}
 export async function bedrockReply(messages, context) {
   // Only this server reads the key. It never reaches browser assets or responses.
   const response = await fetch(
@@ -94,7 +156,7 @@ export function validateRequest(body) {
 }
 export function createApp({
   requestBedrock = bedrockReply,
-  hasKey = () => Boolean(process.env.AWS_BEARER_TOKEN_BEDROCK),
+  hasKey = () => getBedrockConfig().keyConfigured,
   production = false,
 } = {}) {
   const app = express();
@@ -124,11 +186,9 @@ export function createApp({
     const address = req.socket.remoteAddress || "local";
     const entry = requests.get(address) || { count: 0, until: now + 60000 };
     if (++entry.count > 30)
-      return res
-        .status(429)
-        .json({
-          error: "Please wait a moment before asking another question.",
-        });
+      return res.status(429).json({
+        error: "Please wait a moment before asking another question.",
+      });
     requests.set(address, entry);
     const { context } = req.body;
     // Keep only the allowed data fields, and ensure the provider conversation starts with a user.
@@ -148,18 +208,14 @@ export function createApp({
         source: "bedrock",
       });
     } catch (error) {
+      const diagnostic = describeBedrockError(error);
       console.warn(
         "Live coach unavailable:",
-        Number.isInteger(error.status)
-          ? `HTTP ${error.status}`
-          : "connection or response failure",
+        diagnostic.code,
+        diagnostic.upstreamStatus ? `HTTP ${diagnostic.upstreamStatus}` : "",
+        diagnostic.error,
       );
-      return res
-        .status(503)
-        .json({
-          error:
-            "The live coach is temporarily unavailable. The educational guide is still available.",
-        });
+      return res.status(503).json(diagnostic);
     }
   });
   app.use("/api", (_req, res) =>
@@ -190,7 +246,7 @@ if (
   const port = Number(process.env.PORT || 3001);
   const server = createApp({ production }).listen(port, "0.0.0.0", () =>
     console.log(
-      `Investment Coach ${production ? "app" : "API"} listening on port ${port}. Coach: ${process.env.AWS_BEARER_TOKEN_BEDROCK ? "Bedrock configured" : "guided demo"}.`,
+      `Investment Coach ${production ? "app" : "API"} listening on port ${port}. Coach: ${getBedrockConfig().keyConfigured ? "Bedrock configured" : "guided demo"}.`,
     ),
   );
   for (const signal of ["SIGINT", "SIGTERM"])

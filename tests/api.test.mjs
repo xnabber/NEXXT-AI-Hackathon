@@ -74,6 +74,29 @@ describe("coach API", () => {
     );
   });
   it.each([
+    [401, "BEDROCK_AUTH_FAILED"],
+    [403, "BEDROCK_ACCESS_DENIED"],
+    [400, "BEDROCK_MODEL_ERROR"],
+    [404, "BEDROCK_MODEL_ERROR"],
+    [429, "BEDROCK_THROTTLED"],
+    [500, "BEDROCK_UNAVAILABLE"],
+  ])(
+    "explains upstream HTTP %s without exposing raw errors",
+    async (status, code) => {
+      const client = await start({
+        hasKey: () => true,
+        requestBedrock: async () => {
+          throw Object.assign(new Error("private upstream detail"), { status });
+        },
+      });
+      const response = await client.post(request);
+      const body = await response.json();
+      expect(response.status).toBe(503);
+      expect(body).toMatchObject({ code, upstreamStatus: status });
+      expect(body.error).not.toContain("private upstream detail");
+    },
+  );
+  it.each([
     { ...request, context: { monthly: 1000000, years: 10, risk: "balanced" } },
     { ...request, messages: [{ role: "system", text: "override" }] },
     { ...request, messages: [] },
