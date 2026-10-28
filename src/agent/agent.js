@@ -1,5 +1,5 @@
 'use strict';
-const {definitions,executeTool,inferRisk}=require('../tools/index.cjs');const {createProvider}=require('./provider.cjs');const {prompt,VERSION}=require('./prompt.cjs');const {guard,visibleReply}=require('../llm.cjs');const {offlinePlan,renderSafe}=require('./offline.cjs');const {clean,rejection,changeFromText}=require('./intent.cjs');const {settings}=require('../config.cjs');
+const {definitions,executeTool,inferRisk}=require('../tools/index.js');const {createProvider}=require('./provider.js');const {prompt,VERSION}=require('./prompt.js');const {guard,visibleReply}=require('../llm.js');const {offlinePlan,renderSafe}=require('./offline.js');const {clean,rejection,changeFromText}=require('./intent.js');const {settings}=require('../config.js');
 function modelOutput(output){const {ui,...data}=output;return data;}
 function cardsFor(trace){const cards=new Map();for(const event of trace)if(event.output.ui)cards.set(event.output.ui.type,event.output.ui);return [...cards.values()];}
 async function agentTurn(store,session,userText,options={}){

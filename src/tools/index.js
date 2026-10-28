@@ -1,5 +1,5 @@
 'use strict';
-const {spending,capacity,compare,safeLabel}=require('./analysis.cjs');const {project}=require('../engine.cjs');const {byId}=require('../products.cjs');const {proposePlan,publicProposal,failure}=require('../bank.cjs');
+const {spending,capacity,compare,safeLabel}=require('./analysis.js');const {project}=require('../engine.js');const {byId}=require('../products.js');const {proposePlan,publicProposal,failure}=require('../bank.js');
 const object=(properties={},required=[])=>({type:'object',properties,required,additionalProperties:false});
 const string=(maxLength=160)=>({type:'string',minLength:1,maxLength});const number=(minimum,maximum)=>({type:'number',minimum,maximum});
 const definitions=[
@@ -52,7 +52,7 @@ function run(store,session,name,input){
  if(name==='what_if'){
   const key=JSON.stringify([session.customerId,session.turnSequence||0,input.change]);
   if(session.lastChange?.key===key)return session.lastChange.output;
-  const requested=require('../agent/intent.cjs').changeFromText(session.lastUserText,profile,memory);
+  const requested=require('../agent/intent.js').changeFromText(session.lastUserText,profile,memory);
   if(!requested||requested.type!==input.change.type||(requested.type==='goal'?requested.horizonYears!==input.change.horizonYears:requested.amount!==input.change.amount))return failure('EXPLICIT_CHANGE_REQUIRED','Only apply the change the customer actually requested.');
   const before=capacity(profile,memory),oldHorizon=memory.horizonYears,change=input.change;
   if(change.type==='goal'&&session.pendingHorizon&&change.horizonYears!==session.pendingHorizon)return failure('EXPLICIT_CHANGE_REQUIRED','Use the horizon the customer requested.');

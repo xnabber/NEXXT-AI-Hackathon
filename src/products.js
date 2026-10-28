@@ -1,5 +1,5 @@
 'use strict';
-const {freeze}=require('./data/index.cjs');
+const {freeze}=require('./data/index.js');
 const products=freeze([
  {id:'savings',name:'Everyday Buffer',type:'savings',segment:'individual',liquidity:'instant',minimumHorizon:0,returnAssumption:.02,fee:0,risk:1,minimumMonthly:100,illustrative:true},
  {id:'deposit',name:'Flexible Term Deposit',type:'deposit',segment:'individual',liquidity:'locked',minimumHorizon:.25,returnAssumption:.04,fee:0,risk:1,minimumMonthly:100,illustrative:true},

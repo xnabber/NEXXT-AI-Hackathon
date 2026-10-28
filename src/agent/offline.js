@@ -1,5 +1,5 @@
 'use strict';
-const {executeTool,inferRisk}=require('../tools/index.cjs');const {changeFromText}=require('./intent.cjs');
+const {executeTool,inferRisk}=require('../tools/index.js');const {changeFromText}=require('./intent.js');
 const refusal={injection:'I can explain the demo and use its approved tools, but I cannot override safeguards, reveal secrets, or confirm a plan for you.',cross_customer:'I can only use the currently selected fictional customer. Choose a different persona in the demo switcher to start a separate journey.',unsafe_request:'I cannot guarantee returns, invest an emergency fund, or put everything into stocks. We can protect essential cash first and compare suitable options.',off_topic:'I can help with budgeting, saving, investment concepts, or this demo’s onboarding. Please ask a question about those topics.',adviser:'A qualified adviser is the right next step for legal or tax advice. I can prepare a simulated handoff and help organise your questions.'};
 function renderSafe(session,events,reason){
  if(refusal[reason])return refusal[reason];const outputs=events.map(e=>e.output),cap=outputs.findLast(o=>o.ui?.type==='capacity'),change=outputs.findLast(o=>o.ui?.type==='change');
@@ -14,7 +14,7 @@ function renderSafe(session,events,reason){
 function offlinePlan(store,session,text,{onEvent=()=>{},reason}={}){
  const events=[];const call=(name,input={})=>{const e=executeTool(store,session,name,input,onEvent);events.push(e);return e.output;};
  if(reason){if(reason==='adviser')call('handoff_to_adviser',{reason:'Tax or legal question needs a qualified adviser'});return{events,text:renderSafe(session,events,reason)};}
- if(!store.profile(session)){call('request_authentication',{kind:'choice'});if(/simulat|projection|chart/i.test(text))call('simulate',{monthly:session.memory.monthly,years:Math.max(1,Math.round(session.memory.horizonYears))});return{events,text:renderSafe(session,events)};}
+ if(!store.profile(session)){call('simulate',{monthly:session.memory.monthly,years:Math.max(1,Math.round(session.memory.horizonYears)),productId:session.memory.riskComfort||'balanced'});call('request_authentication',{kind:'choice'});return{events,text:require('../coach.js').guidedReply(text,{monthly:session.memory.monthly,years:Math.max(1,Math.round(session.memory.horizonYears)),risk:session.memory.riskComfort||'balanced'},session.messages.filter(m=>m.role==='user').at(-2)?.text)};}
  call('get_customer_profile');call('get_spending_summary',{months:12});let cap=call('find_savings_capacity');
  const change=session.lastChange?.turn===session.turnSequence&&session.lastChange.customer===session.customerId?session.lastChange.output.change:changeFromText(text,store.profile(session),session.memory);if(change){call('what_if',{change});cap=call('find_savings_capacity');}
  const risk=inferRisk(text);if(risk)call('set_risk_profile',{answer:risk});

@@ -1,6 +1,6 @@
 'use strict';
 const {test}=require('node:test');const assert=require('node:assert/strict');
-const {generatePersonas,personas,CATEGORIES}=require('../src/data/index.cjs');
+const {generatePersonas,personas,CATEGORIES}=require('../src/data/index.js');
 test('W1 seeded transaction generation is deterministic',()=>assert.deepEqual(generatePersonas(),generatePersonas()));
 for(const profile of Object.values(personas)){
  test(`W1 ${profile.id}: twelve months and balance reconciliation`,()=>{
@@ -14,7 +14,7 @@ for(const profile of Object.values(personas)){
  });
 }
 test('W1 catalogue retains three actual baseline funds and adds personal cash and two business products',()=>{
- const {products}=require('../src/products.cjs');assert.equal(products.length,7);
+ const {products}=require('../src/products.js');assert.equal(products.length,7);
  for(const id of ['steady','balanced','growth'])assert(products.some(p=>p.id===id));
  assert.equal(products.filter(p=>p.segment==='business').length,2);
  assert(products.every(p=>p.illustrative&&p.liquidity&&p.minimumHorizon>=0&&p.fee>=0));

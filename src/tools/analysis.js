@@ -1,5 +1,5 @@
 'use strict';
-const {round}=require('../engine.cjs');const {products}=require('../products.cjs');
+const {round}=require('../engine.js');const {products}=require('../products.js');
 const essentialCategories=['rent/mortgage','utilities','groceries','transport','health','tax'];
 function safeLabel(value){const text=String(value).replace(/[\u0000-\u001f\u007f]/g,'').slice(0,120);return /ignore.*instruction|system prompt|override|reveal.*secret|confirm.*plan|invest.*everything/i.test(text)?'[untrusted demo label]':text;}
 function spending(profile,months=12){
@@ -40,7 +40,7 @@ function compare(profile,memory,options={}){
   if(profile.segment==='individual'&&p.type==='fund'&&horizon>=5&&cap.ready)score+=20;
   if(!cap.ready&&p.type==='savings')score+=40;
   if(profile.incomePattern==='irregular'&&p.liquidity==='instant')score+=25;
-  return {...p,score,eligible:whyNot.length===0,why,whyNot};
+  return {...p,score,monthlyLimit:cap.ready?cap.safeMonthly:cap.microSaving,eligible:whyNot.length===0,why,whyNot};
  }).sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
  return {goal:safeLabel(options.goal||memory.goal||profile.goals[0].name),horizonYears:horizon,needsLiquidity:liquid,riskComfort:risk||'unknown',products:ranked,synthetic:true};
 }

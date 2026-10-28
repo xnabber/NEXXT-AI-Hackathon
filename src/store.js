@@ -1,5 +1,5 @@
 'use strict';
-const {randomUUID}=require('node:crypto');const {personas}=require('./data/index.cjs');
+const {randomUUID}=require('node:crypto');const {personas}=require('./data/index.js');
 class MemoryStore{
  constructor(){this.sessions=new Map();this.proposals=new Map();this.plans=new Map();this.audit=[];this.cache=new Map();this.now=()=>Date.now();}
  createSession(){const session={id:randomUUID(),customerId:null,authenticated:false,language:'en',memory:{goal:'Explore investing',horizonYears:10,needsLiquidity:false,riskComfort:null,monthly:500,bonus:0,rentDelta:0},messages:[],revision:0,otpAttempts:0,otpVerified:false,createdAt:this.now()};this.sessions.set(session.id,session);return session;}

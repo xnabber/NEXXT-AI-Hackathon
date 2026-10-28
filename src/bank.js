@@ -1,5 +1,5 @@
 'use strict';
-const {randomUUID}=require('node:crypto');const {freeze}=require('./data/index.cjs');const {byId}=require('./products.cjs');const {capacity,compare}=require('./tools/analysis.cjs');
+const {randomUUID}=require('node:crypto');const {freeze}=require('./data/index.js');const {byId}=require('./products.js');const {capacity,compare}=require('./tools/analysis.js');
 const failure=(code,message)=>({error:{code,message}});
 function checkPlan(store,session,productId,monthly){
  const profile=store.profile(session);if(!session.authenticated||!profile)return failure('AUTH_REQUIRED','Continue with a demo account first.');
@@ -11,7 +11,8 @@ function checkPlan(store,session,productId,monthly){
  const existing=[...store.plans.values()].filter(p=>p.owner===session.id&&p.customer===session.customerId).reduce((s,p)=>s+p.monthly,0);
  const limit=product.type==='savings'&&!cap.ready?cap.microSaving:cap.safeMonthly;
  if(monthly<product.minimumMonthly||monthly+existing>limit)return failure('CAPACITY_LIMIT','This amount exceeds the current safe capacity or product minimum.');
- if(product.type==='ladder'&&(cap.idleCash<300||monthly!==0))return failure('CAPACITY_LIMIT','A business ladder uses the available one-off surplus, not a monthly fund payment.');
+ const priorPrincipal=[...store.plans.values()].filter(p=>p.owner===session.id&&p.customer===session.customerId).reduce((s,p)=>s+(p.principal||0),0);
+ if(product.type==='ladder'&&(cap.idleCash<300||monthly!==0||cap.rungs.reduce((s,r)=>s+r.amount,0)+priorPrincipal>cap.idleCash))return failure('CAPACITY_LIMIT','A business ladder uses the available one-off surplus, not a monthly fund payment.');
  return {product,capacity:cap,principal:product.type==='ladder'?cap.rungs.reduce((s,r)=>s+r.amount,0):0};
 }
 function proposePlan(store,session,input){

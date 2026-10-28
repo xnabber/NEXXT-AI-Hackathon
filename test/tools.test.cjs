@@ -1,5 +1,5 @@
 'use strict';
-const {test}=require('node:test');const assert=require('node:assert/strict');const {MemoryStore}=require('../src/store.cjs');const {executeTool,definitions}=require('../src/tools/index.cjs');const {confirmProposal}=require('../src/bank.cjs');
+const {test}=require('node:test');const assert=require('node:assert/strict');const {MemoryStore}=require('../src/store.js');const {executeTool,definitions}=require('../src/tools/index.js');const {confirmProposal}=require('../src/bank.js');
 function fixture(id='ioana'){const store=new MemoryStore(),session=store.createSession();store.selectPersona(session,id);return{store,session,tool:(name,input={})=>executeTool(store,session,name,input).output};}
 for(const spec of definitions)test(`W2 ${spec.name} rejects invalid input without throwing`,()=>{const f=fixture();assert(f.tool(spec.name,{unexpected:1}).error);});
 test('W2 profile is scoped and contains no raw customer id',()=>{const f=fixture();assert(!Object.hasOwn(f.tool('get_customer_profile'),'id'));assert.equal(f.tool('get_spending_summary',{customerId:'mihai'}).error.code,'FORBIDDEN');});
