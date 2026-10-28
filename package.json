@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "start": "node --env-file-if-exists=.env server/index.mjs --production",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run && node --test test/*.test.cjs",
     "test:e2e": "playwright test",
     "bedrock:test": "node --env-file-if-exists=.env server/check-bedrock.mjs"
   },
