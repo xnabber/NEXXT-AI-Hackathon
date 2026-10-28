@@ -11,6 +11,7 @@
     "dev": "node --watch server.js",
     "test": "node --test test/*.test.cjs",
     "bedrock:test": "node scripts/check-provider.js --bedrock",
-    "provider:test": "node scripts/check-provider.js"
+    "provider:test": "node scripts/check-provider.js",
+    "eval": "node eval/run.js"
   }
 }
