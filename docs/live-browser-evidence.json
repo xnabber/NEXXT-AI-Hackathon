@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-28T18:41:45.438Z",
+  "provider": "bedrock",
+  "model": "us.amazon.nova-pro-v1:0",
+  "mode": "agent",
+  "tools": [
+    {
+      "tool": "get_customer_profile",
+      "origin": "verified-context"
+    },
+    {
+      "tool": "get_spending_summary",
+      "origin": "verified-context"
+    },
+    {
+      "tool": "find_savings_capacity",
+      "origin": "verified-context"
+    },
+    {
+      "tool": "set_risk_profile",
+      "origin": "explicit-user-answer"
+    },
+    {
+      "tool": "compare_products",
+      "origin": "model-selected"
+    },
+    {
+      "tool": "simulate",
+      "origin": "model-selected"
+    },
+    {
+      "tool": "propose_plan",
+      "origin": "model-selected"
+    }
+  ],
+  "cards": [
+    "profile",
+    "budget",
+    "capacity",
+    "risk",
+    "compare",
+    "simulation",
+    "plan_proposal"
+  ],
+  "ms": 6659,
+  "tokens": 12452,
+  "activatedPlans": 0
+}

@@ -1,0 +1,7 @@
+The coach now uses scoped financial tools to analyse synthetic customer histories, compare products, replan and prepare immutable proposals. A separate user confirmation endpoint enforces suitability and capacity before activating any demo plan. Four personas, English/Romanian cards, visible tool activity and a same-tool offline planner make the full journey usable without a provider.
+
+The active app uses Node 20+ built-ins with no runtime/dev dependencies or build step. Original React sources and tests are preserved in `legacy/react`; the actual baseline's 48 behavior checks were ported to node:test. Anthropic/OpenAI adapters have contract tests; live evidence uses the previously configured Bedrock key. All banking data, access and activation are fictional.
+
+Validation: 113/113 tests; scripted evaluation 40/40 and 14/14 safety; latest Bedrock Nova Pro evaluation 36/40 (90%) and 14/14 safety. Four live failures fell back safely and are documented in `docs/EVAL_REPORT.md`. Actual HTTP loadtest: 100 journeys, 20 concurrent, zero errors, 773.7 requests/s and 42.1 ms p95 in a short local sample. English/Romanian desktop/mobile flows, downloads, live tool UI and zero reported axe violations on the checked coach pages are recorded in `REPORT.md` and screenshots.
+
+Please review as a draft. Do not merge. `REPORT.md` documents baseline mismatches, memory-only storage, unknown pricing and unverified live Anthropic/OpenAI access.

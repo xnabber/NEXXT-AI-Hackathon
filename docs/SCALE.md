@@ -1,16 +1,16 @@
 # Scale and growth evidence
 
-Measured 2026-10-28T18:19:22.448Z using actual loopback HTTP against an ephemeral Node server, not direct function calls. All four personas complete bootstrap → selection → offline tool analysis → proposal → explicit confirmation → refreshed account.
+Measured 2026-10-28T18:38:20.205Z using actual loopback HTTP against an ephemeral Node server, not direct function calls. All four personas complete bootstrap → selection → offline tool analysis → proposal → explicit confirmation → refreshed account.
 
 | Measure | Result |
 |---|---:|
 | Journeys / concurrency | 100 / 20 |
 | Completed / errors | 100 / 0 |
 | Requests | 500 |
-| Throughput | 812.0 requests/s |
-| Request latency p50 / p95 / p99 | 18.4 / 40.9 / 147.4 ms |
-| Elapsed | 0.62 s |
-| End RSS | 111 MiB |
+| Throughput | 773.7 requests/s |
+| Request latency p50 / p95 / p99 | 19.8 / 42.1 / 134.4 ms |
+| Elapsed | 0.65 s |
+| End RSS | 113 MiB |
 
 Node v24.19.0; linux x64; INTEL(R) XEON(R) PLATINUM 8573C; 5 visible logical CPUs; 33.3 GiB host-visible memory. Container quotas and shared host contention may differ. This short single-process loopback sample excludes network transit, TLS, a database, cold starts and model latency. It establishes demo behavior under concurrency, not production capacity or an SLA.
 
