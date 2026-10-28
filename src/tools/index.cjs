@@ -29,13 +29,14 @@ function executeTool(store,session,name,input={},notify=()=>{}){
   else if(!valid(spec.inputSchema,input))output=failure('INVALID_INPUT','The tool input does not match its schema.');
   else output=run(store,session,name,input);
  }catch{output=failure('TOOL_FAILURE','The tool could not complete. Please try a simpler request.');}
- const event={tool:name,input:JSON.parse(JSON.stringify(input||{})),output,summary:output.error?output.error.code:output.ui?.type||'completed',ms:Math.round((performance.now()-start)*100)/100};
+ let safeInput;try{safeInput=JSON.parse(JSON.stringify(input||{}));}catch{safeInput={invalid:true};}
+ const event={tool:name,input:safeInput,output,summary:output.error?output.error.code:output.ui?.type||'completed',ms:Math.round((performance.now()-start)*100)/100};
  store.record(session,'tool',{tool:name,decision:output.error?'denied':'completed',ms:event.ms,reason:output.error?.code});notify(event);return event;
 }
 function run(store,session,name,input){
  const profile=store.profile(session),memory=session.memory;
  if(name==='request_authentication')return{kind:input.kind,ui:{type:'auth',kind:input.kind}};
- if(name==='set_risk_profile'){if(inferRisk(session.lastUserText)!==input.answer)return failure('EXPLICIT_RISK_REQUIRED','Choose your own risk preference before we record it.');memory.riskComfort=input.answer;session.revision++;return{answer:input.answer,ui:{type:'risk',answer:input.answer}};}
+ if(name==='set_risk_profile'){if(inferRisk(session.lastUserText)!==input.answer)return failure('EXPLICIT_RISK_REQUIRED','Choose your own risk preference before we record it.');if(memory.riskComfort!==input.answer){memory.riskComfort=input.answer;session.revision++;}return{answer:input.answer,ui:{type:'risk',answer:input.answer}};}
  if(name==='handoff_to_adviser'){session.handoff={reason:safeLabel(input.reason),conversation:session.messages.slice(-12),preparedAt:store.now()};return{prepared:true,sent:false,ui:{type:'handoff',reason:safeLabel(input.reason),sent:false}};}
  if(name==='simulate'){
   const product=byId(input.productId||'balanced');if(!product)return failure('INVALID_PRODUCT','Unknown example product.');
@@ -49,11 +50,16 @@ function run(store,session,name,input){
  if(name==='find_savings_capacity'){const result=capacity(profile,memory);return{...result,ui:{type:'capacity',...result}};}
  if(name==='compare_products'){const result=compare(profile,memory,input);return{...result,ui:{type:'compare',...result}};}
  if(name==='what_if'){
+  const key=JSON.stringify([session.customerId,session.turnSequence||0,input.change]);
+  if(session.lastChange?.key===key)return session.lastChange.output;
+  const requested=require('../agent/intent.cjs').changeFromText(session.lastUserText,profile,memory);
+  if(!requested||requested.type!==input.change.type||(requested.type==='goal'?requested.horizonYears!==input.change.horizonYears:requested.amount!==input.change.amount))return failure('EXPLICIT_CHANGE_REQUIRED','Only apply the change the customer actually requested.');
   const before=capacity(profile,memory),oldHorizon=memory.horizonYears,change=input.change;
-  if(change.type==='goal'){memory.goal=safeLabel(change.goal);memory.horizonYears=change.horizonYears;memory.needsLiquidity=change.needsLiquidity??true;}
+  if(change.type==='goal'&&session.pendingHorizon&&change.horizonYears!==session.pendingHorizon)return failure('EXPLICIT_CHANGE_REQUIRED','Use the horizon the customer requested.');
+  if(change.type==='goal'){delete session.pendingHorizon;memory.goal=safeLabel(change.goal);memory.horizonYears=change.horizonYears;memory.needsLiquidity=change.needsLiquidity??true;}
   if(change.type==='bonus')memory.bonus+=change.amount;if(change.type==='rent')memory.rentDelta+=change.amount;
   session.revision++;const after=capacity(profile,memory);const diff={safeMonthly:after.safeMonthly-before.safeMonthly,idleCash:after.idleCash-before.idleCash,horizonYears:memory.horizonYears-oldHorizon};
-  return{change,before,after,diff,goal:memory.goal,horizonYears:memory.horizonYears,ui:{type:'change',change,before,after,diff,goal:memory.goal,horizonYears:memory.horizonYears}};
+  const output={change,before,after,diff,goal:memory.goal,horizonYears:memory.horizonYears,ui:{type:'change',change,before,after,diff,goal:memory.goal,horizonYears:memory.horizonYears}};session.lastChange={key,output,turn:session.turnSequence||0,customer:session.customerId};return output;
  }
  if(name==='propose_plan'){const result=proposePlan(store,session,input);if(result.error)return result;const proposal=publicProposal(result.proposal);return{proposal,ui:{type:'plan_proposal',...proposal}};}
  return failure('UNKNOWN_TOOL','Unknown tool.');

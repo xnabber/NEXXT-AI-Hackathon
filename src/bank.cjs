@@ -5,7 +5,8 @@ function checkPlan(store,session,productId,monthly){
  const profile=store.profile(session);if(!session.authenticated||!profile)return failure('AUTH_REQUIRED','Continue with a demo account first.');
  const product=byId(productId);if(!product||product.segment!==profile.segment)return failure('PRODUCT_NOT_ALLOWED','This product is not available for this demo customer.');
  if(!Number.isInteger(monthly)||monthly<0||monthly>10000||monthly%50)return failure('INVALID_AMOUNT','Use an allowed monthly amount in steps of fifty.');
- const cap=capacity(profile,session.memory),fit=compare(profile,session.memory).products.find(p=>p.id===productId);
+ const effective={...session.memory,horizonYears:Math.min(session.memory.horizonYears,session.pendingHorizon||Infinity)};
+ const cap=capacity(profile,effective),fit=compare(profile,effective).products.find(p=>p.id===productId);
  if(!fit?.eligible)return failure('UNSUITABLE','The product does not fit the buffer, horizon, liquidity needs, or recorded risk answer.');
  const existing=[...store.plans.values()].filter(p=>p.owner===session.id&&p.customer===session.customerId).reduce((s,p)=>s+p.monthly,0);
  const limit=product.type==='savings'&&!cap.ready?cap.microSaving:cap.safeMonthly;
@@ -15,7 +16,7 @@ function checkPlan(store,session,productId,monthly){
 }
 function proposePlan(store,session,input){
  const check=checkPlan(store,session,input.productId,input.monthly);if(check.error)return check;
- const proposal=freeze({id:randomUUID(),owner:session.id,customer:session.customerId,revision:session.revision,productId:input.productId,productName:check.product.name,monthly:input.monthly,principal:check.principal,rungs:check.product.type==='ladder'?check.capacity.rungs:[],expiresAt:store.now()+600000,createdAt:store.now(),demo:true});
+ const proposal=freeze({id:randomUUID(),owner:session.id,customer:session.customerId,revision:session.revision,productId:input.productId,productName:check.product.name,monthly:input.monthly,principal:check.principal,rungs:check.product.type==='ladder'?check.capacity.rungs:[],expiresAt:store.now()+600000,createdAt:store.now(),expiresInMinutes:10,demo:true});
  store.proposals.set(proposal.id,proposal);store.record(session,'proposal',{decision:'created'});return {proposal};
 }
 function publicProposal(p){const {owner,customer,revision,...safe}=p;return safe;}
