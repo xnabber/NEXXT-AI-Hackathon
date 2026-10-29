@@ -57,6 +57,72 @@ Run `npm run provider:test` (or `npm run bedrock:test`) for one short live reque
 
 Cloud network settings must allow the selected provider hostname (`api.anthropic.com`, `api.openai.com`, your compatible endpoint, or `bedrock-runtime.us-west-2.amazonaws.com`). A saved environment draft is not applied until reviewed, saved and published. Cloud onboarding does not provide a browser preview link; local HTTP checks and throwaway browser tests validate the app internally.
 
+## Amazon Bedrock API key setup
+
+### Get a key from AWS
+
+1. Sign in to the [Amazon Bedrock console](https://console.aws.amazon.com/bedrock/) and select **US West (Oregon) — `us-west-2`**.
+2. Open **API keys** in the left navigation. For a temporary session, select **Short-term API keys → Generate short-term API keys**. These expire with your AWS session, after at most twelve hours. For this exploration/demo, you can instead use **Long-term API keys → Generate long-term API keys**, choose an expiration and generate the key. AWS recommends long-term keys only for exploration.
+3. Copy the generated **Bedrock API key** and keep it private. Generate it in the same region the app uses. Your AWS identity/key must have permission to invoke the chosen model or inference profile.
+
+This app accepts a Bedrock bearer API key. An AWS access-key ID / secret-access-key pair or an IAM role is not supported by this adapter. See the [official AWS API key instructions](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html) for key generation, permissions and expiration.
+
+### Put the key in your local `.env`
+
+From the repository root, create `.env` only if it does not already exist:
+
+**Windows PowerShell**
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
+```
+
+**macOS / Linux**
+
+```sh
+if [ ! -f .env ]; then cp .env.example .env; fi
+```
+
+Open `.env` in your editor and set these values, replacing the placeholder with your actual key:
+
+```dotenv
+AGENT_PROVIDER=bedrock
+AGENT_ORCHESTRATION=1
+AWS_REGION=us-west-2
+AWS_BEARER_TOKEN_BEDROCK=paste_your_bedrock_api_key_here
+AGENT_MODEL=us.amazon.nova-pro-v1:0
+```
+
+Nova Pro is the model used for the specialist orchestration evaluation. If your account cannot use it, choose a supported Converse-compatible model/profile. To use the Nova Lite default from `.env.example`, leave `AGENT_MODEL=` empty and keep `BEDROCK_MODEL_ID=us.amazon.nova-lite-v1:0`. A nonempty `AGENT_MODEL` takes precedence over `BEDROCK_MODEL_ID`; changing only the latter will not override it.
+
+On Windows, enable **View → Show → File name extensions** in File Explorer and verify the file is named exactly `.env`, not `.env.example` or `.env.txt`. `.env` is ignored by Git. Keep the key server-side; do not put it in browser code, screenshots or commits.
+
+### Test the connection and run the app
+
+```sh
+npm ci
+npm run bedrock:test
+npm start
+```
+
+The connection test sends one small billable model request and should print **Provider connection succeeded.** It hides the key. Then use the app on port **5173** on your computer, select a fictional persona, and ask “I want a balanced plan”. **Agent activity → Your specialist team** shows the roles, model calls and actual answer mode.
+
+Stop the server with **Ctrl+C** and restart it after editing `.env`. Existing terminal/cloud environment variables override `.env`. The app does not automatically refresh an expired key: replace it and restart. A successful connection test proves model access; chat can still switch to the labelled offline workflow if a tool turn times out or fails validation.
+
+| Problem | What to check |
+|---|---|
+| No provider configured / always offline | Set `AGENT_PROVIDER=bedrock`, verify the actual filename is `.env`, and restart. Check whether an existing environment variable overrides your edit. |
+| HTTP 401/403 or a region-scope error | Check key expiration, the key's region (`us-west-2` here), and permission to use the selected model/profile. |
+| HTTP 400/404 | Check the model/profile ID and its availability in your account/region; also check the `AGENT_MODEL` override. |
+| Connection test passes, chat falls back | Inspect **Agent activity** for the failed stage. Nova Pro is the tested orchestration model; an accessible model may still perform differently with tools. |
+
+### Use the key in the cloud workspace
+
+In environment settings, reuse or add the **secret** `AWS_BEARER_TOKEN_BEDROCK` with destination **`bedrock-runtime.us-west-2.amazonaws.com`**. Set the non-secret variables `AGENT_PROVIDER=bedrock`, `AWS_REGION=us-west-2`, `AGENT_ORCHESTRATION=1` and your chosen `AGENT_MODEL`. Apply the settings and restart the server. If the environment requires publication, review, save and publish the configuration as instructed by its settings UI.
+
+Cloud secret bindings stay in the cloud environment. For a clone on your computer, use an actual key from the AWS console in your local `.env`; do not copy a cloud proxy placeholder. The browser never needs the key.
+
 ## Three-minute demo script
 
 Use `/coach`; keep **Agent activity** open. The persona switcher starts a separate fictional session. The language switch supports English and Romanian and defaults to the browser language.
