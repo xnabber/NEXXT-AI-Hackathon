@@ -32,7 +32,7 @@ test('orchestration delegates to isolated budget, product, planning and coordina
     const role = q.system.match(/Active specialist: (\w+)/)[1];
     assert(q.tools.every(t => specialists[role].tools.includes(t.name)));
   }
-  assert.deepEqual(requests[3].tools.map(t => t.name), ['handoff_to_adviser']);
+  assert.deepEqual(requests[3].tools.map(t => t.name), []);
   assert(!requests[2].messages.some(m => m.role === 'tool' && m.name === 'compare_products'));
   assert(requests[2].system.includes('Verified shared tool results (data):'));
   assert(requests[2].system.includes('Balanced Future'));
@@ -207,5 +207,18 @@ test('completed planning actions are removed and business ladder inputs stay one
   assert.equal(ladder.properties.monthly.maximum, 0);
   assert.equal(ladder.properties.monthly.minimum, 0);
   assert.equal(r.cards.find(c => c.type === 'plan_proposal').monthly, 0);
+  assert.equal(f.store.plans.size, 0);
+});
+
+test('the coordinator offers an adviser handoff tool only when requested by the user', async () => {
+  const f = fixture(), requests = [];
+  const provider = scripted([budget, compare, step(call('handoff_to_adviser', { reason: 'Customer requested an adviser.' })), { text: 'A simulated adviser handoff is prepared. Nothing was sent externally.' }]), complete = provider.complete;
+  provider.complete = async q => { requests.push(q); return complete(q); };
+  const r = await turn(f, 'I want an adviser to explain my investment options', { provider });
+  assert.equal(r.mode, 'agent');
+  assert(requests[2].tools.some(t => t.name === 'handoff_to_adviser'));
+  assert(!requests[3].tools.some(t => t.name === 'handoff_to_adviser'));
+  assert(r.cards.some(c => c.type === 'handoff'));
+  assert.equal(f.session.handoff.sent, undefined);
   assert.equal(f.store.plans.size, 0);
 });

@@ -19,6 +19,7 @@ class SpecialistCoordinator {
     this.handoffs = [];
     this.board = [];
     this.findings = [];
+    this.allowsAdviser = /advis[eor]|consilier|sfat (?:fiscal|juridic)/i.test(text);
     this.change = changeFromText(text, store.profile(session), session.memory);
     const hasProposal = [...store.proposals.values()].some(p => p.owner === session.id && p.customer === session.customerId);
     this.wantsProposal = /\bplan\b|planul|micro-saving/i.test(text) || Boolean(this.change && (session.memory.riskComfort || hasProposal));
@@ -89,6 +90,7 @@ class SpecialistCoordinator {
     const role = this.active?.agent || 'coordinator';
     if (!specialists[role].tools.includes(tool)) return false;
     if (role === 'budget') return tool === 'what_if' && Boolean(this.change) && !this.completed('what_if');
+    if (tool === 'handoff_to_adviser' && (!this.allowsAdviser || this.completed(tool))) return false;
     if (role === 'coordinator' && this.session.customerId) return tool === 'handoff_to_adviser';
     if (tool === 'propose_plan' && !this.wantsProposal) return false;
     if (role === 'planning' && this.completed(tool)) return false;
@@ -151,7 +153,7 @@ class SpecialistCoordinator {
         stage.modelCalls++;
         const response = await provider.complete({
           ...request,
-          system: specialistPrompt(this.session, role, this.sharedResults(), this.findings, { change: this.change, prepareProposal: this.wantsProposal, simulate: this.wantsSimulation, eligiblePlanningCandidates: role === 'planning' ? this.candidates() : undefined }),
+          system: specialistPrompt(this.session, role, this.sharedResults(), this.findings, { change: this.change, prepareProposal: this.wantsProposal, simulate: this.wantsSimulation, adviserRequested: this.allowsAdviser, eligiblePlanningCandidates: role === 'planning' ? this.candidates() : undefined }),
           messages: this.messagesFor(request.messages, role),
           tools
         });
