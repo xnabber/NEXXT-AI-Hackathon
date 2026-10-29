@@ -219,6 +219,6 @@ test('the coordinator offers an adviser handoff tool only when requested by the 
   assert(requests[2].tools.some(t => t.name === 'handoff_to_adviser'));
   assert(!requests[3].tools.some(t => t.name === 'handoff_to_adviser'));
   assert(r.cards.some(c => c.type === 'handoff'));
-  assert.equal(f.session.handoff.sent, undefined);
+  assert.equal(r.trace.find(e => e.tool === 'handoff_to_adviser').output.sent, false);
   assert.equal(f.store.plans.size, 0);
 });
