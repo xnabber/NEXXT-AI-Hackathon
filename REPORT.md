@@ -1,8 +1,54 @@
-# Implementation and validation report
+# Project report
 
-The active application is a dependency-free, tool-using investment-coach demonstration on **agent-upgrade**. Main was not edited or merged. All customers, history, products, access and plans are synthetic. No real money moves. Implementation work is complete; opening the requested draft PR is externally blocked by GitHub API network access, as described below. Anthropic/OpenAI live verification also remains unperformed because their credentials are not configured.
+## Specialist orchestration — 29 October 2026
 
-## Work packages
+The app now has a per-turn supervisor coordinating **budget, products, planning and coordinator** roles. Each live role uses its own prompt, permitted tools and isolated tool transcript with the configured provider/model. The supervisor shares verified current-turn financial results and publishes one guarded final answer. All roles share the existing six-exchange, twelve-second and token limits. The active application still has zero runtime/dev dependencies.
+
+The specialist UI shows starts/completions, handoffs, tool ownership, actual mode and model-call counts. Offline mode identifies the same deterministic workflow with zero model calls. Stop marks the active stage stopped and preserves the next draft; switching personas clears previous activity. Separate proposal confirmation, bank suitability/capacity, session scoping and original access flows remain intact.
+
+Source: `src/agent/orchestrator.js`, `specialists.js`, the bounded execution-engine hooks in `agent.js`, and the activity UI. Planning schemas require explicit eligible products and product-specific affordable amounts; completed actions are removed. Coordinator adviser handoff is exposed only for a user request. Rejected private findings are not forwarded to other specialists, and reused provider call IDs do not determine transcript ownership.
+
+### Current evidence
+
+| Check | Actual result |
+|---|---|
+| `npm test` | **129/129 pass**, zero failures or skips; includes all 113 prior checks and 16 new orchestration tests |
+| `npm run eval` | **40/40**, **14/14 safety**; `specialist-supervisor-v4` scripted fixtures |
+| Live Bedrock Nova Pro | **39/40 (97.5%)**, **14/14 safety**; measured 2026-10-29T08:02:52.551Z |
+| Live calls and latency | 3.35 model calls, 5.30 tool calls and 4905.1 ms per conversation on average |
+| Live reported tokens / price | 285303 tokens; cost unknown because pricing assumptions are not configured |
+| Offline HTTP loadtest | 100/100 complete journeys, 20 concurrent, 0 errors; 799.3 requests/s, p95 41.5 ms |
+| Browser | English desktop and Romanian 390 px layouts; explicit confirmation; cancellation/draft retention and persona reset; no JavaScript errors |
+| Automated accessibility | Zero reported axe A/AA violations on the checked English desktop and Romanian phone coach pages |
+
+The live run uses `AGENT_PROVIDER=bedrock AGENT_MODEL=us.amazon.nova-pro-v1:0 npm run eval -- --live`. This point-in-time sample reaches the requested ninety-percent quality target; it is not a guarantee of future model behavior. Anthropic/OpenAI adapters retain contract coverage; their live credentials are unavailable. The test runner returns nonzero when any scenario fails, so the live run's 39/40 is reported as partial rather than a green all-pass result.
+
+Current live failure:
+
+- `elena-plan`: missing appropriate proposal.
+
+That case produced an eligible business cash-product proposal rather than the fixture's required ladder. The forty evaluation conversations activated **zero plans**; all activation still requires the separate explicit confirmation endpoint. See [EVAL_REPORT.md](docs/EVAL_REPORT.md) for every scenario. Earlier prototype orchestration runs exposed omitted simulation product IDs and repeated actions; required IDs, eligible-product schemas, product-specific ceilings and completed-action removal address those findings.
+
+The new tests cover real multi-stage provider exchanges, role-specific tool blocking, private-finding repair, refreshed goal context, explicit product constraints, business ladder amounts, removal of completed work, concurrent-customer isolation, globally shared limits, cancellation, deterministic provenance, opt-out compatibility, requested adviser handoff and actual SSE event ordering. They do not replace existing checks.
+
+[ORCHESTRATION.md](docs/ORCHESTRATION.md) describes the routing, permissions and trust boundaries. [Browser evidence](docs/orchestration-browser-evidence.json) and [live browser evidence](docs/orchestration-live-browser.json) record the actual checks. Screenshots: [desktop](docs/screenshots/orchestration-desktop.png), [Romanian phone](docs/screenshots/orchestration-mobile-ro.png), [live specialists](docs/screenshots/orchestration-live.png). Browser tooling is throwaway software outside the checkout.
+
+### Run and review
+
+Run `npm ci`, then `npm start`; the single UI/API server uses port 5173. Orchestration is enabled by default with `AGENT_ORCHESTRATION=1`. Select a fictional persona, ask for a plan, and expand **Agent activity → Your specialist team**. The existing Bedrock configuration works; no new services or credential types are needed. `AGENT_ORCHESTRATION=0` restores the previous single-agent execution path.
+
+Changes are on `agent-upgrade`, with main unchanged. GitHub API access is now working; the previous network blocker has been resolved. The draft PR body is prepared in [PULL_REQUEST.md](docs/PULL_REQUEST.md). The prepared description documents the complete draft review scope and current evidence. No merge is authorized or performed.
+
+---
+
+## Historical initial delivery — 28 October 2026
+
+The following records the earlier single-agent delivery and its then-current measurements/network limitation. The current specialist results and GitHub status above supersede it.
+
+
+The active application is a dependency-free, tool-using investment-coach demonstration on **agent-upgrade**. Main was not edited or merged. All customers, history, products, access and plans are synthetic. No real money moves. At the initial delivery, opening the requested draft PR was externally blocked by GitHub API network access, as described below. The current update above supersedes that status. Anthropic/OpenAI live verification also remains unperformed because their credentials are not configured.
+
+### Work packages
 
 | Package | Delivered and evidence |
 |---|---|
@@ -18,7 +64,7 @@ The active application is a dependency-free, tool-using investment-coach demonst
 
 Commits were made after each package, with passing `npm test` before each commit. Additional tested commits resolve evaluation findings and preserve anonymous context through both account paths. No sub-agents were used.
 
-## Actual validation output
+### Actual validation output
 
 Executed on Node v24.19.0 in this managed Linux workspace. The application supports Node 20+; a separate Node 20 runtime matrix was not available or claimed.
 
@@ -78,7 +124,7 @@ elapsed: 0.646 s; end RSS: 113 MiB
 
 The exact CPU/host-visible memory and limitations are in [SCALE.md](docs/SCALE.md). This is a short local HTTP sample, not production scale or model latency.
 
-## Browser and live evidence
+### Browser and live evidence
 
 Throwaway Playwright and axe were used from `/tmp/agent-qa`, outside the checkout, as explicitly permitted. No browser-test dependency or framework was added to the application.
 
@@ -90,7 +136,7 @@ No horizontal page overflow was observed at widths **390, 760, 1024, 1360, 1920 
 
 Screenshots: [landing](docs/screenshots/landing-desktop.png), [offline coach](docs/screenshots/coach-desktop.png), [Romanian phone](docs/screenshots/coach-mobile-ro.png), [live agent](docs/screenshots/coach-live-agent.png), [dashboard](docs/screenshots/admin-desktop.png).
 
-## Definition of done audit
+### Definition of done audit
 
 | # | Status | Evidence / qualification |
 |---|---|---|
@@ -111,7 +157,7 @@ Screenshots: [landing](docs/screenshots/landing-desktop.png), [offline coach](do
 | 15 | Pass | No active package dependencies or devDependencies; no build; only Node/browser built-ins. |
 | 16 | Pass | README submission section, diagram, real/mocked boundary and actionable persona demo script. |
 
-## Explicit deviations and limits
+### Explicit deviations and limits
 
 The brief described a different CommonJS repository with five products and twenty-three tests. The actual checkout was React/Vite/Express/AWS SDK with three funds, forty-eight unit/API tests and seventeen browser tests on its latest feature branch. Branch `agent-upgrade` was created from `origin/main` and merged that tested feature history, rather than silently discarding the latest user work. See [BASELINE.md](docs/BASELINE.md). Main is unchanged. All old sources/test files remain archived and all Git history is retained. No deck or `source/` directory existed to delete or rewrite.
 
@@ -125,7 +171,7 @@ The model does not decide every context-read action: the application supplies ve
 
 Storage is in memory, including audit/cache. Production multi-worker deployment requires durable atomic confirmation, distributed sessions/limits, TTL cleanup, real authentication and external observability. The API enforces per-session request limits; it is not a production abuse-prevention system. Admin is intentionally public only in synthetic demo mode. Model and infrastructure cost assumptions are separate, and absent model prices are unknown.
 
-## GitHub and cloud environment status
+### GitHub and cloud environment status
 
 Implementation commits are on `agent-upgrade`; no merge was performed. The final branch is pushed using existing HTTPS Git authentication. Read-only Git access succeeds. A GitHub API probe using the existing CLI/authentication returns:
 

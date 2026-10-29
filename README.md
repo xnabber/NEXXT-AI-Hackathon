@@ -6,7 +6,7 @@ The model can call validated tools to investigate a customer, compare options, s
 
 ```mermaid
 flowchart LR
-  Q[Customer question + journey facts] --> A[Bounded agent loop]
+  Q[Customer question + journey facts] --> A[Supervisor + scoped specialist agents]
   A <--> M[Anthropic / OpenAI-compatible / Bedrock]
   A <--> T[Profile · Budget · Capacity · Compare · What-if · Simulate · Propose]
   T --> C[Validated tool cards + public activity]
@@ -20,6 +20,14 @@ flowchart LR
 The application reads verified profile/budget/capacity context before the model acts. Model-selected comparisons, changes, simulations and proposals remain visible in the activity panel; the trace identifies which calls were application initiated. This is tool orchestration, not a claim that every step is chosen by the model.
 
 **Real:** provider calls when configured, validated tools, calculations, immutable proposals, server-side checks, confirmation endpoint, audit, responsive UI and measurements. **Mocked:** all customers, transactions, products, account access, OTP, adviser handoff and activation. No real account is opened and no real money moves. Return and fee assumptions are illustrative, not forecasts. The model never receives a money-movement tool.
+
+## Specialist orchestration
+
+A supervisor now coordinates **budget → products → planning → coordinator**, with independent role prompts, scoped tools and isolated tool transcripts. Specialists share verified results; only the coordinator publishes the final reply. The team shares the existing per-turn timeout, token and iteration limits, and every plan still requires separate user confirmation.
+
+Orchestration is enabled by default (`AGENT_ORCHESTRATION=1`). In **Agent activity**, inspect the specialist team, handoffs, model-call counts and tool ownership. Offline mode runs the same tool workflow and explicitly reports zero model calls. Set `AGENT_ORCHESTRATION=0` and restart to use the previous single-agent loop. No dependencies or additional services are needed.
+
+See [ORCHESTRATION.md](docs/ORCHESTRATION.md) for permissions, context boundaries, failure behavior and verification.
 
 ## Run in 60 seconds
 
@@ -60,7 +68,7 @@ Use `/coach`; keep **Agent activity** open. The persona switcher starts a separa
 5. **2:20–2:45 — Elena:** select Elena; send “Make a plan for our bakery surplus”. Show operating/payroll reserves and staggered business deposit maturities.
 6. **2:45–3:00 — Evidence:** switch to RO to show translated controls; open `/admin` for funnel, mode split, tool usage, costs and confirmation conversion. State whether the current answer is agent or offline and which provider is configured.
 
-The offline version runs the whole script without a key. Live models may fall back safely; the mode badge reports that truthfully. The recorded Nova Pro run passed 36/40 scenarios (90%), including 14/14 safety cases; three replies had no usable final text and one replanning case reached the iteration limit. Anthropic and OpenAI live quality is not established without their credentials.
+The offline version runs the whole script without a key. Live models may fall back safely; the mode badge reports that truthfully. The recorded `specialist-supervisor-v4` run with Nova Pro passed **39/40 scenarios (97.5%)**, including **14/14 safety cases**. One business-plan case chose an eligible cash product instead of the expected deposit ladder. Anthropic and OpenAI live quality is not established without their credentials.
 
 ## Validation and measured evidence
 
@@ -71,8 +79,9 @@ npm run eval -- --live
 npm run loadtest
 ```
 
-- [Evaluation report](docs/EVAL_REPORT.md): forty scenarios, including fourteen safety scenarios; scripted baseline **40/40 overall and 14/14 safety**. Live Bedrock Nova Pro: **36/40 (90%) overall, 14/14 safety**, averaging about **4.35 seconds per conversation**. Exact failures, tools, latency and unpriced cost are reported separately. A fallback is a live quality failure.
-- [Scale report](docs/SCALE.md): actual HTTP, one hundred complete journeys, twenty concurrent, zero errors; approximately **774 requests/s**, **42 ms p95** in the recorded short loopback run. This excludes model/network/database latency and is not production capacity.
+- `npm test`: **129/129** regression, safety, provider, HTTP and orchestration tests.
+- [Evaluation report](docs/EVAL_REPORT.md): forty scenarios, including fourteen safety scenarios; scripted **40/40 overall and 14/14 safety**. Live Bedrock Nova Pro: **39/40 (97.5%) overall, 14/14 safety**, averaging **4.91 seconds per conversation**. Exact failures, role/model-call counts, latency and unpriced cost are reported separately. A fallback is a live quality failure.
+- [Scale report](docs/SCALE.md): actual HTTP, one hundred complete journeys, twenty concurrent, zero errors; approximately **799 requests/s**, **42 ms p95** in the recorded short loopback run. This excludes model/network/database latency and is not production capacity.
 - [REPORT.md](REPORT.md): work package evidence, checklist, real output, browser/accessibility checks and deviations.
 - [Architecture](docs/ARCHITECTURE.md): trust boundaries, capacity assumptions, failure handling and storage/scale limits.
 - [Baseline differences](docs/BASELINE.md): the supplied brief described another repository. The actual baseline's React/Vitest tests and sources are archived in `legacy/react/`; their behavior is ported to dependency-free Node tests. The nonexistent “previous 23 tests” and five products are not claimed to have existed.

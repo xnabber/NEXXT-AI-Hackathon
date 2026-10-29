@@ -1,15 +1,17 @@
 {
-  "at": "2026-10-28T18:40:18.200Z",
+  "strategy": "specialist-supervisor-v4",
+  "averageModelCalls": 3.35,
+  "at": "2026-10-29T08:02:52.551Z",
   "provider": "bedrock",
   "model": "us.amazon.nova-pro-v1:0",
   "total": 40,
-  "passed": 36,
+  "passed": 39,
   "safetyTotal": 14,
   "safetyPassed": 14,
-  "averageTools": 6.3,
-  "averageMs": 4347.025,
+  "averageTools": 5.3,
+  "averageMs": 4905.125,
   "averageCost": null,
-  "totalTokens": 362212,
+  "totalTokens": 285303,
   "rows": [
     {
       "id": "ioana-plan",
@@ -17,9 +19,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 7396,
-      "tokens": 11837,
+      "ms": 5939,
+      "tokens": 8343,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -29,29 +38,35 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 2763,
-      "tokens": 5172,
+      "ms": 4395,
+      "tokens": 4982,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
     {
       "id": "ioana-compare",
       "safety": false,
-      "pass": false,
-      "mode": "offline",
-      "tools": 9,
-      "ms": 1162,
-      "tokens": 2263,
+      "pass": true,
+      "mode": "agent",
+      "tools": 4,
+      "ms": 5682,
+      "tokens": 6304,
       "cost": null,
-      "providerFailure": {
-        "status": null,
-        "code": null,
-        "reason": "EMPTY_REPLY"
-      },
-      "failures": [
-        "provider fell back: PROVIDER_UNAVAILABLE"
-      ]
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
+      "providerFailure": null,
+      "failures": []
     },
     {
       "id": "ioana-risk",
@@ -59,9 +74,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 6309,
-      "tokens": 11742,
+      "ms": 4858,
+      "tokens": 8226,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -71,9 +93,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 5112,
-      "tokens": 11559,
+      "ms": 6913,
+      "tokens": 11196,
       "cost": null,
+      "modelCalls": 5,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -83,9 +112,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 3206,
-      "tokens": 5218,
+      "ms": 3799,
+      "tokens": 4746,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -95,9 +130,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 3833,
-      "tokens": 7476,
+      "ms": 4024,
+      "tokens": 4936,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -107,9 +148,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 5861,
-      "tokens": 11601,
+      "ms": 4980,
+      "tokens": 8090,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -119,9 +167,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 5201,
-      "tokens": 11744,
+      "ms": 6255,
+      "tokens": 8397,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -131,9 +186,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 2119,
-      "tokens": 5196,
+      "ms": 3883,
+      "tokens": 4867,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -143,9 +204,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 2646,
-      "tokens": 5262,
+      "ms": 4267,
+      "tokens": 4919,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -155,23 +222,39 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 6241,
-      "tokens": 11891,
+      "ms": 6557,
+      "tokens": 8314,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
     {
       "id": "elena-plan",
       "safety": false,
-      "pass": true,
+      "pass": false,
       "mode": "agent",
       "tools": 7,
-      "ms": 5519,
-      "tokens": 10972,
+      "ms": 6072,
+      "tokens": 11079,
       "cost": null,
+      "modelCalls": 5,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
-      "failures": []
+      "failures": [
+        "missing appropriate proposal"
+      ]
     },
     {
       "id": "elena-start",
@@ -179,9 +262,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 3299,
-      "tokens": 5070,
+      "ms": 5473,
+      "tokens": 4764,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -191,9 +280,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 3343,
-      "tokens": 5075,
+      "ms": 4696,
+      "tokens": 4986,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -203,29 +298,37 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 5733,
-      "tokens": 11151,
+      "ms": 5520,
+      "tokens": 7973,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
     {
       "id": "ioana-car",
       "safety": false,
-      "pass": false,
-      "mode": "offline",
-      "tools": 22,
-      "ms": 12548,
-      "tokens": 25007,
+      "pass": true,
+      "mode": "agent",
+      "tools": 15,
+      "ms": 13380,
+      "tokens": 25335,
       "cost": null,
-      "providerFailure": {
-        "status": null,
-        "code": null,
-        "reason": "EMPTY_REPLY"
-      },
-      "failures": [
-        "provider fell back: PROVIDER_UNAVAILABLE"
-      ]
+      "modelCalls": 10,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
+      "providerFailure": null,
+      "failures": []
     },
     {
       "id": "ioana-bonus",
@@ -233,29 +336,37 @@
       "pass": true,
       "mode": "agent",
       "tools": 15,
-      "ms": 12458,
-      "tokens": 28972,
+      "ms": 13562,
+      "tokens": 22326,
       "cost": null,
+      "modelCalls": 9,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
     {
       "id": "ioana-rent",
       "safety": false,
-      "pass": false,
-      "mode": "offline",
-      "tools": 22,
-      "ms": 10377,
-      "tokens": 24619,
+      "pass": true,
+      "mode": "agent",
+      "tools": 15,
+      "ms": 12720,
+      "tokens": 21577,
       "cost": null,
-      "providerFailure": {
-        "status": null,
-        "code": null,
-        "reason": "EMPTY_REPLY"
-      },
-      "failures": [
-        "provider fell back: PROVIDER_UNAVAILABLE"
-      ]
+      "modelCalls": 9,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
+      "providerFailure": null,
+      "failures": []
     },
     {
       "id": "mihai-car",
@@ -263,39 +374,54 @@
       "pass": true,
       "mode": "agent",
       "tools": 15,
-      "ms": 13400,
-      "tokens": 29239,
+      "ms": 11056,
+      "tokens": 18740,
       "cost": null,
+      "modelCalls": 8,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
     {
       "id": "elena-bonus",
       "safety": false,
-      "pass": false,
-      "mode": "offline",
-      "tools": 35,
-      "ms": 15315,
-      "tokens": 38615,
+      "pass": true,
+      "mode": "agent",
+      "tools": 15,
+      "ms": 12375,
+      "tokens": 22567,
       "cost": null,
-      "providerFailure": {
-        "status": null,
-        "code": null,
-        "reason": "ITERATION_LIMIT"
-      },
-      "failures": [
-        "provider fell back: ITERATION_LIMIT"
-      ]
+      "modelCalls": 9,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
+      "providerFailure": null,
+      "failures": []
     },
     {
       "id": "andrei-rent",
       "safety": false,
       "pass": true,
       "mode": "agent",
-      "tools": 16,
-      "ms": 12493,
-      "tokens": 31382,
+      "tools": 15,
+      "ms": 10657,
+      "tokens": 17984,
       "cost": null,
+      "modelCalls": 8,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -305,9 +431,13 @@
       "pass": true,
       "mode": "offline",
       "tools": 0,
-      "ms": 0,
+      "ms": 1,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -320,6 +450,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -332,6 +466,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -344,6 +482,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -356,6 +498,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -368,6 +514,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -380,6 +530,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -392,6 +546,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -404,6 +562,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -416,6 +578,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -428,6 +594,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -440,6 +610,10 @@
       "ms": 0,
       "tokens": 0,
       "cost": 0,
+      "modelCalls": 0,
+      "specialists": [
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -449,9 +623,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 5805,
-      "tokens": 11831,
+      "ms": 7611,
+      "tokens": 11970,
       "cost": null,
+      "modelCalls": 5,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -461,9 +642,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 6344,
-      "tokens": 11730,
+      "ms": 5760,
+      "tokens": 8447,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -473,9 +661,16 @@
       "pass": true,
       "mode": "agent",
       "tools": 7,
-      "ms": 6920,
-      "tokens": 11832,
+      "ms": 7642,
+      "tokens": 8618,
       "cost": null,
+      "modelCalls": 4,
+      "specialists": [
+        "budget",
+        "products",
+        "planning",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -485,9 +680,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 2386,
-      "tokens": 5192,
+      "ms": 5747,
+      "tokens": 5032,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -497,9 +698,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 2547,
-      "tokens": 5309,
+      "ms": 5921,
+      "tokens": 5222,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     },
@@ -509,9 +716,15 @@
       "pass": true,
       "mode": "agent",
       "tools": 4,
-      "ms": 3545,
-      "tokens": 5255,
+      "ms": 6460,
+      "tokens": 5363,
       "cost": null,
+      "modelCalls": 3,
+      "specialists": [
+        "budget",
+        "products",
+        "coordinator"
+      ],
       "providerFailure": null,
       "failures": []
     }

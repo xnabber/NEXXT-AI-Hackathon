@@ -29,12 +29,18 @@ flowchart LR
 | `src/data/` | Seeded historic synthetic transactions, four immutable personas, recurring expenses and obligations |
 | `src/products.js`, `src/engine.js` | Fictional product facts; monthly annuity, fees, inflation and stress examples |
 | `src/tools/` | Closed input schemas, scoping, sanitized untrusted labels, deterministic analysis, UI payloads and decision audit |
-| `src/agent/` | Provider adapters, versioned system instructions, bounded model/tool exchange, fallback and trace |
+| `src/agent/` | Specialist supervisor, role scopes, provider adapters, versioned system instructions, bounded model/tool exchange, fallback and trace |
 | `src/llm.js` | Numeric grounding (including Romanian formatting), rate-specific percentage checks, unsafe claim checks, removal of thinking blocks |
 | `src/bank.js` | Proposal immutability, expiry, suitability, capacity, ownership and fresh checks at confirmation |
 | `src/store.js` | Replaceable storage boundary for session facts, proposals, plans, audit and scoped bounded read cache |
 | `public/`, `src/i18n/` | Accessible responsive UI and English/Romanian copy; browser renders the tool's `ui` data |
 | `eval/`, `scripts/loadtest.js` | Real loop fixtures and actual HTTP concurrent-journey measurements |
+
+## Specialist supervisor
+
+The default entry point is `src/agent/orchestrator.js`. It reuses the bounded `agentTurn` execution engine, assigning independent budget, product, planning and coordinator prompts defined in `specialists.js`. All roles use the configured provider/model. Their tool transcripts are isolated by server-side ownership tags; a current-turn verified board carries financial results between them. Guard-rejected specialist prose is kept out of other roles' messages.
+
+Tool permissions are enforced before execution, and planning tool schemas require an explicit eligible product and affordable contribution ceiling. The supervisor shares one global deadline/token/exchange budget across all roles. It publishes stage/handoff metadata without private findings or hidden reasoning. Offline execution identifies the same functional roles with zero model calls. `AGENT_ORCHESTRATION=0` retains the prior single-agent path. See [ORCHESTRATION.md](ORCHESTRATION.md) for the complete routing and trust model.
 
 ## A turn
 

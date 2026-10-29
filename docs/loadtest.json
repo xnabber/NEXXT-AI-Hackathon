@@ -1,8 +1,8 @@
 {
-  "at": "2026-10-28T18:38:20.205Z",
+  "at": "2026-10-29T07:45:01.841Z",
   "node": "v24.19.0",
   "platform": "linux x64",
-  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
   "visibleLogicalCPUs": 5,
   "totalMemoryGiB": 33.3,
   "journeys": 100,
@@ -10,10 +10,10 @@
   "completed": 100,
   "errors": 0,
   "requests": 500,
-  "seconds": 0.6462041290000001,
-  "rps": 773.7493116513341,
-  "p50": 19.84142300000002,
-  "p95": 42.057097,
-  "p99": 134.373446,
-  "rssMiB": 113
+  "seconds": 0.625556467,
+  "rps": 799.288355850376,
+  "p50": 18.72472399999998,
+  "p95": 41.540884000000005,
+  "p99": 129.74799399999998,
+  "rssMiB": 124
 }

@@ -222,3 +222,16 @@ test('the coordinator offers an adviser handoff tool only when requested by the 
   assert.equal(r.trace.find(e => e.tool === 'handoff_to_adviser').output.sent, false);
   assert.equal(f.store.plans.size, 0);
 });
+
+test('the token allowance is shared across specialist handoffs', async () => {
+  const f = fixture(); let calls = 0;
+  const provider = scripted([budget, compare, plan, final]), complete = provider.complete;
+  provider.complete = async q => { calls++; return complete(q); };
+  const r = await turn(f, 'I want a balanced plan', { provider, config: { tokenBudget: 35 } });
+  assert.equal(calls, 2);
+  assert.equal(r.mode, 'offline');
+  assert.equal(r.fallbackReason, 'TOKEN_BUDGET');
+  assert.equal(r.usage.totalTokens, 40);
+  assert(r.orchestration.stages.some(s => s.agent === 'products' && s.status === 'fallback'));
+  assert.equal(f.store.plans.size, 0);
+});

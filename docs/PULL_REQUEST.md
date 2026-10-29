@@ -1,7 +1,15 @@
-The coach now uses scoped financial tools to analyse synthetic customer histories, compare products, replan and prepare immutable proposals. A separate user confirmation endpoint enforces suitability and capacity before activating any demo plan. Four personas, English/Romanian cards, visible tool activity and a same-tool offline planner make the full journey usable without a provider.
+The investment coach now analyses synthetic customer history and completes financial planning work through scoped budget, product, planning and coordinator agents. Independent role prompts and tool transcripts share verified results under one global time/token/exchange budget. The activity panel shows real handoffs and tool ownership; offline mode uses the same deterministic tools and reports zero model calls. Only a separate, bank-checked user confirmation can activate a demo plan.
 
-The active app uses Node 20+ built-ins with no runtime/dev dependencies or build step. Original React sources and tests are preserved in `legacy/react`; the actual baseline's 48 behavior checks were ported to node:test. Anthropic/OpenAI adapters have contract tests; live evidence uses the previously configured Bedrock key. All banking data, access and activation are fictional.
+This branch also contains the earlier dependency-free CommonJS upgrade, four fictional personas, budgeting/product/simulation cards, English/Romanian access and plan flows, and aggregate audit/funnel metrics. Original React sources/tests are archived in `legacy/react`; 48 actual baseline behaviors were ported to `node:test`. All banking data, access, OTP and activation are synthetic. No real money moves.
 
-Validation: 113/113 tests; scripted evaluation 40/40 and 14/14 safety; latest Bedrock Nova Pro evaluation 36/40 (90%) and 14/14 safety. Four live failures fell back safely and are documented in `docs/EVAL_REPORT.md`. Actual HTTP loadtest: 100 journeys, 20 concurrent, zero errors, 773.7 requests/s and 42.1 ms p95 in a short local sample. English/Romanian desktop/mobile flows, downloads, live tool UI and zero reported axe violations on the checked coach pages are recorded in `REPORT.md` and screenshots.
+Validation:
 
-Please review as a draft. Do not merge. `REPORT.md` documents baseline mismatches, memory-only storage, unknown pricing and unverified live Anthropic/OpenAI access.
+- 129/129 tests, including role/tool isolation, guarded handoffs, concurrent-customer scoping, cancellation and actual SSE.
+- 40/40 scripted scenarios, including 14/14 safety cases.
+- Latest live Bedrock Nova Pro: 39/40 (97.5%), 14/14 safety. The business cash-product-versus-ladder mismatch is recorded in `docs/EVAL_REPORT.md`.
+- Actual offline HTTP loadtest: 100 journeys, 20 concurrent, zero errors; 799.3 requests/s and 41.5 ms p95 in a short loopback sample.
+- English desktop/Romanian phone UI, explicit confirmation, Stop/draft retention, persona activity reset, live specialist calls and zero reported axe violations on the checked coach pages.
+
+`REPORT.md`, `docs/ORCHESTRATION.md` and `docs/ARCHITECTURE.md` explain the trust boundaries and limitations. Anthropic/OpenAI have contract tests; live verification uses the existing Bedrock key. Costs are unknown without configured prices, state is in memory, and provider behavior varies. No runtime/dev dependencies or build step were added. `AGENT_ORCHESTRATION=0` preserves the prior single-agent path.
+
+Please review as a draft. Do not merge.
