@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-29T07:36:27.324Z",
+  "checks": [
+    "Offline specialist stages, handoffs, ownership and zero model calls displayed",
+    "Proposal remains separate from explicit confirmation",
+    "Romanian specialist labels and 390px layout without page overflow",
+    "No browser JavaScript errors",
+    "Stopping marks the active specialist as stopped, preserves the next draft and does not apply an unexecuted bonus",
+    "Persona switching clears prior specialist activity"
+  ],
+  "axe": [
+    {
+      "page": "English orchestration desktop",
+      "violations": []
+    },
+    {
+      "page": "Romanian orchestration mobile",
+      "violations": []
+    }
+  ],
+  "cancellationCheckedAt": "2026-10-29T08:03:26.399Z"
+}

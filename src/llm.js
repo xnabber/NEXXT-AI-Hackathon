@@ -1,0 +1,21 @@
+'use strict';
+function numberWords(text){
+ const words={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,twenty:20,thirty:30,unu:1,o:1,un:1,doi:2,doua:2,'două':2,trei:3,patru:4,cinci:5,'șase':6,sase:6,'șapte':7,sapte:7,opt:8,'nouă':9,noua:9,zece:10};
+ const units={hundred:100,thousand:1000,million:1000000,'sută':100,sute:100,mie:1000,mii:1000,milion:1000000,milioane:1000000};
+ let value=String(text).replace(/\b([\p{L}]+)\s+(hundred|thousand|million|sută|sute|mie|mii|milion|milioane)(?:\s+de)?(?=\s+(?:lei|ron|euros?|dollars?|percent|procente|la sută))/giu,(full,n,unit)=>words[n.toLowerCase()]?String(words[n.toLowerCase()]*units[unit.toLowerCase()]):full);
+ value=value.replace(/\b([\p{L}]+)(?:\s+de)?(?=\s+(?:lei|ron|percent|procente|months?|years?|luni|ani|la sută)\b)/giu,(full,n)=>words[n.toLowerCase()]!==undefined?String(words[n.toLowerCase()]):full);
+ return value.replace(/(\d)\s*(?:percent|procente|la sută)\b/gi,'$1%');
+}
+function canonical(token){let text=String(token).replace(/−/g,'-').replace(/[\u00a0\u202f ]/g,'').replace(/%$/,'');if(text.includes(',')&&text.includes('.')){const decimal=text.lastIndexOf(',')>text.lastIndexOf('.')?',':'.';text=text.split(decimal==='.'?',':'.').join('').replace(decimal,'.');}else if(/[.,]/.test(text)){const separator=text.includes(',')?',':'.';const chunks=text.split(separator);if(chunks.length>2||(chunks[1]?.length===3&&chunks[0]!=='0'))text=chunks.join('');else text=text.replace(separator,'.');}return Number(text);}
+function numericTokens(text){const values=[];for(const match of numberWords(text).replace(/−/g,'-').matchAll(/(?<![\p{L}\d])[-+]?\d+(?:[.,\u00a0\u202f ]\d+)*(?:\s*%)?/gu)){const n=canonical(match[0]);if(Number.isFinite(n))values.push(n);}const words={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,twenty:20,thirty:30,unu:1,doi:2,doua:2,'două':2,trei:3,patru:4,cinci:5,'șase':6,sase:6,'șapte':7,sapte:7,opt:8,'nouă':9,noua:9,zece:10};for(const m of String(text).toLowerCase().matchAll(/\b([\p{L}]+)\s+(?:lei|ron|percent|months?|years?|luni|ani|la sută)\b/gu))if(words[m[1]]!==undefined)values.push(words[m[1]]);return values;}
+function allowedNumbers(outputs){const allowed=new Set();function add(n,key=''){if(!Number.isFinite(n))return;allowed.add(n);allowed.add(Math.round(n));allowed.add(Math.round(n*100)/100);if(/fee|return|inflation|rate|assumption/i.test(key))allowed.add(Math.round(n*10000)/100);}
+ function visit(value,key=''){if(typeof value==='number')add(value,key);else if(Array.isArray(value))value.forEach(v=>visit(v,key));else if(value&&typeof value==='object')for(const[k,v]of Object.entries(value)){if(/^(id|owner|customer|createdAt|expiresAt|activatedAt|merchant|name|goal|reason|description|input)$/i.test(k))continue;visit(v,k);}else if(typeof value==='string'&&key==='ageBand')numericTokens(value).forEach(n=>add(n));}outputs.forEach(visit);return allowed;}
+function guard(text,outputs){
+ const allowed=allowedNumbers(outputs),unsupported=numericTokens(text).filter(n=>![...allowed].some(a=>Math.abs(a-n)<.000001));
+ const rates=new Set();function visit(value,key=''){if(typeof value==='number'&&/fee|return|inflation|rate|assumption/i.test(key))rates.add(Math.round(value*10000)/100);else if(Array.isArray(value))value.forEach(v=>visit(v,key));else if(value&&typeof value==='object')for(const[k,v]of Object.entries(value))visit(v,k);}outputs.forEach(o=>visit(o));
+ for(const match of numberWords(text).matchAll(/[-+]?\d+(?:[.,]\d+)*\s*%/g)){const n=canonical(match[0]);if(!rates.has(n)&&!unsupported.includes(n))unsupported.push(n);}
+ const claims=String(text).split(/[.!?]/).some(sentence=>/guaranteed? (?:returns?|profit|capital)|risk.free|randament garantat|fără risc|I (?:have )?(?:moved|invested|activated|scheduled)|am (?:transferat|investit|activat|programat)/i.test(sentence)&&!/not |no |never |cannot |aren.t |nu |niciun/i.test(sentence));
+ return{ok:unsupported.length===0&&!claims,unsupported,unsafeClaim:claims};
+}
+function visibleReply(text){const clean=String(text||'').replace(/<(thinking|analysis|reasoning|think)>[\s\S]*?<\/\1>/gi,'').replace(/<(thinking|analysis|reasoning|think)>[\s\S]*$/gi,'').trim();return clean.split(/\n\s*\n/).find(p=>p.trim()&&!/^#{1,6}\s/.test(p.trim()))?.trim()||'';}
+module.exports={canonical,numericTokens,allowedNumbers,guard,visibleReply};

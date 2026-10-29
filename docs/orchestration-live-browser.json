@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-29T08:06:33.175Z",
+  "provider": "bedrock",
+  "model": "us.amazon.nova-pro-v1:0",
+  "mode": "agent",
+  "strategy": "specialist-supervisor-v4",
+  "stages": [
+    {
+      "id": 1,
+      "agent": "budget",
+      "mode": "agent",
+      "status": "completed",
+      "modelCalls": 1,
+      "inputTokens": 1173,
+      "outputTokens": 55,
+      "ms": 1108,
+      "toolCount": 4,
+      "tools": [
+        "get_customer_profile",
+        "get_spending_summary",
+        "find_savings_capacity",
+        "set_risk_profile"
+      ]
+    },
+    {
+      "id": 2,
+      "agent": "products",
+      "mode": "agent",
+      "status": "completed",
+      "modelCalls": 1,
+      "inputTokens": 1682,
+      "outputTokens": 96,
+      "ms": 1411,
+      "toolCount": 1,
+      "tools": [
+        "compare_products"
+      ]
+    },
+    {
+      "id": 3,
+      "agent": "planning",
+      "mode": "agent",
+      "status": "completed",
+      "modelCalls": 1,
+      "inputTokens": 2900,
+      "outputTokens": 177,
+      "ms": 1948,
+      "toolCount": 2,
+      "tools": [
+        "simulate",
+        "propose_plan"
+      ]
+    },
+    {
+      "id": 4,
+      "agent": "coordinator",
+      "mode": "agent",
+      "status": "completed",
+      "modelCalls": 1,
+      "inputTokens": 2273,
+      "outputTokens": 124,
+      "ms": 1679,
+      "toolCount": 0,
+      "tools": []
+    }
+  ],
+  "ms": 6148,
+  "totalTokens": 8480,
+  "activatedPlans": 0
+}

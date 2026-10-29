@@ -1,0 +1,5 @@
+'use strict';
+const fs=require('node:fs');const path=require('node:path');
+function loadEnv(file=path.resolve('.env')){try{for(const line of fs.readFileSync(file,'utf8').split(/\r?\n/)){const match=line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);if(!match||Object.hasOwn(process.env,match[1]))continue;let value=match[2];if((value[0]==='"'&&value.at(-1)==='"')||(value[0]==="'"&&value.at(-1)==="'"))value=value.slice(1,-1);else value=value.replace(/\s+#.*$/,'').trim();process.env[match[1]]=value;}}catch(error){if(error.code!=='ENOENT')throw error;}}
+function settings(){return{provider:process.env.AGENT_PROVIDER||'offline',orchestration:process.env.AGENT_ORCHESTRATION!=='0',model:process.env.AGENT_MODEL||'',timeoutMs:Math.min(12000,Math.max(100,Number(process.env.AGENT_TIMEOUT_MS)||12000)),tokenBudget:Math.max(100,Number(process.env.AGENT_TOKEN_BUDGET)||40000),inputPrice:!process.env.AGENT_INPUT_USD_PER_MILLION?.trim()?null:Number(process.env.AGENT_INPUT_USD_PER_MILLION),outputPrice:!process.env.AGENT_OUTPUT_USD_PER_MILLION?.trim()?null:Number(process.env.AGENT_OUTPUT_USD_PER_MILLION),demo:process.env.DEMO_MODE!=='0'};}
+module.exports={loadEnv,settings};
