@@ -29,7 +29,7 @@ async function agentTurn(store,session,userText,options={}){
  session.turnSequence=(session.turnSequence||0)+1;session.lastUserText=text;const change=changeFromText(text,store.profile(session),session.memory);if(change?.type==='goal'){session.pendingHorizon=change.horizonYears;session.revision++;}
  session.messages.push({role:'user',text});session.messages=session.messages.slice(-12);
  const blocked=rejection(text,session);let mode='offline',answer,reason=blocked||null;
- const event=e=>{trace.push(e);notify({type:'tool',...e});};
+ const event=e=>{if(options.decorateTool)Object.assign(e,options.decorateTool(e));trace.push(e);notify({type:'tool',...e});};
  if(!blocked&&!session.customerId){if(change?.type==='goal'&&change.horizonYears>=.25&&change.horizonYears<=50){Object.assign(session.memory,{goal:change.goal,horizonYears:change.horizonYears,needsLiquidity:true,explicit:true});delete session.pendingHorizon;}const risk=inferRisk(text);if(risk){executeTool(store,session,'set_risk_profile',{answer:risk},event);session.memory.explicit=true;}}
  if(provider&&!blocked){
   const controller=new AbortController();let timer,onAbort;const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('TURN_TIMEOUT'));},config.timeoutMs);});
@@ -45,8 +45,8 @@ async function agentTurn(store,session,userText,options={}){
     usage.inputTokens+=response.usage?.inputTokens||0;usage.outputTokens+=response.usage?.outputTokens||0;usage.totalTokens=usage.inputTokens+usage.outputTokens;
     if(usage.totalTokens>config.tokenBudget)throw new Error('TOKEN_BUDGET');
     if(response.toolCalls?.length){
-     if(response.toolCalls.length>12)throw new Error('TOOL_LIMIT');messages.push({role:'assistant',text:response.text||'',toolCalls:response.toolCalls});
-     for(const call of response.toolCalls){notify({type:'tool_start',tool:call.name,input:call.input});const e=executeTool(store,session,call.name,call.input,event);messages.push({role:'tool',toolCallId:call.id,name:call.name,output:modelOutput(e.output)});if(call.name==='what_if'&&!e.output.error)executeTool(store,session,'find_savings_capacity',{},update=>{update.origin='verified-context';event(update);});}
+     if(response.toolCalls.length>12)throw new Error('TOOL_LIMIT');messages.push({role:'assistant',text:response.text||'',toolCalls:response.toolCalls,agent:options.currentAgent?.()});
+     for(const call of response.toolCalls){notify({type:'tool_start',tool:call.name,input:call.input});let e;if(options.authorizeTool&&!options.authorizeTool(call.name,call.input)){e={tool:call.name,input:call.input,output:{error:{code:'SPECIALIST_TOOL_DENIED',message:'This specialist cannot use that tool.'}},summary:'SPECIALIST_TOOL_DENIED',ms:0};store.record(session,'tool',{tool:call.name,decision:'denied',reason:'SPECIALIST_TOOL_DENIED'});event(e);}else e=executeTool(store,session,call.name,call.input,event);messages.push({role:'tool',toolCallId:call.id,name:call.name,output:modelOutput(e.output),agent:e.agent});if(call.name==='what_if'&&!e.output.error)executeTool(store,session,'find_savings_capacity',{},update=>{update.origin='verified-context';event(update);});}
      continue;
     }
     response.text=visibleReply(response.text);if(!response.text?.trim())throw new Error('EMPTY_REPLY');
@@ -55,8 +55,9 @@ async function agentTurn(store,session,userText,options={}){
     if(!result.ok){
      options.onGuardFailure?.({text:response.text,unsupported:result.unsupported});
      if(repaired)throw new Error(result.unsafeClaim?'ANSWER_GUARD':'NUMERIC_GUARD');repaired=true;
-     messages.push({role:'assistant',text:response.text},{role:'user',text:'Your answer contains unsupported figures. Retry once with NO numerals or percentages in your final prose. The UI cards already show all validated numbers. Give a short qualitative answer.'});continue;
+     messages.push({role:'assistant',text:response.text,agent:options.currentAgent?.()},{role:'user',agent:options.currentAgent?.(),text:'Your answer contains unsupported figures. Retry once with NO numerals or percentages in your final prose. The UI cards already show all validated numbers. Give a short qualitative answer.'});continue;
     }
+    if(response.handoff&&options.onHandoff){options.onHandoff(response);continue;}
     const missing=[];
     if(session.customerId&&!trace.some(e=>e.tool==='compare_products'&&!e.output.error))missing.push('compare_products');
     if(change&&!trace.some(e=>e.tool==='what_if'&&!e.output.error))missing.push('what_if using the exact requested change '+JSON.stringify(change));
@@ -64,7 +65,8 @@ async function agentTurn(store,session,userText,options={}){
     const wantsProposal=/\bplan\b|planul|micro-saving/i.test(text);
     if(wantsProposal&&capacityOutput&&(session.memory.riskComfort||capacityOutput.segment==='business'||capacityOutput.microSaving>0)&&!trace.some(e=>e.tool==='propose_plan'&&!e.output.error))missing.push('simulate and propose_plan for an eligible product within capacity; use monthly zero for a business ladder');
     if(trace.some(e=>e.tool==='propose_plan'&&!e.output.error)&&!trace.some(e=>e.tool==='simulate'&&!e.output.error))missing.push('simulate the proposal product and amount');
-    if(missing.length&&!workflowRepaired){workflowRepaired=true;messages.push({role:'user',text:'Before finishing this task, call the missing tools: '+missing.join('; ')+'. Then give a short final paragraph. Do not repeat completed tools.'});continue;}
+    if(options.missingWork)missing.splice(0,missing.length,...options.missingWork());
+    if(missing.length&&!workflowRepaired){workflowRepaired=true;messages.push({role:'user',agent:options.currentAgent?.(),text:'Before finishing this task, call the missing tools: '+missing.join('; ')+'. Then give a short final paragraph. Do not repeat completed tools.'});continue;}
     if(missing.length)throw new Error('INCOMPLETE_WORKFLOW');
     
     if(!trace.length)throw new Error('NO_TOOLS');answer=response.text;mode='agent';break;
@@ -73,7 +75,7 @@ async function agentTurn(store,session,userText,options={}){
   }catch(error){options.onProviderFailure?.({status:error.status,code:error.code,reason:error.message});if(error.message==='TURN_ABORTED'||options.signal?.aborted){store.record(session,'turn_cancelled',{mode:'agent'});return{cancelled:true,messages:[],cards:[],trace,mode:'offline',usage};}reason=['INCOMPLETE_WORKFLOW','ANSWER_GUARD','TURN_TIMEOUT','TOKEN_BUDGET','NUMERIC_GUARD','ITERATION_LIMIT','NO_TOOLS','TOOL_LIMIT'].includes(error.message)?error.message:'PROVIDER_UNAVAILABLE';}
   finally{clearTimeout(timer);options.signal?.removeEventListener('abort',onAbort);controller.abort();}
  }
- if(!answer){const fallback=offlinePlan(store,session,text,{onEvent:event,reason:blocked});answer=fallback.text;}
+ if(!answer){options.onFallback?.(reason);const fallback=offlinePlan(store,session,text,{onEvent:event,reason:blocked});answer=fallback.text;}
  // Even templated copy must not accidentally introduce an unsupported numeral.
  if(!guard(answer,trace.map(e=>e.output)).ok)answer=renderSafe(session,trace,blocked);
  if(config.inputPrice!==null&&config.outputPrice!==null)usage.estimatedCostUSD=(usage.inputTokens*config.inputPrice+usage.outputTokens*config.outputPrice)/1000000;else usage.estimatedCostUSD=usage.totalTokens?null:0;
@@ -81,4 +83,4 @@ async function agentTurn(store,session,userText,options={}){
  const ms=Math.round(performance.now()-started);store.record(session,'turn',{mode,ms,tokens:usage.totalTokens,inputTokens:usage.inputTokens,outputTokens:usage.outputTokens,cost:usage.estimatedCostUSD,reason:reason||undefined});
  const result={messages:[{role:'assistant',text:answer}],cards:cardsFor(trace),trace,mode,usage,ms,promptVersion:VERSION,fallbackReason:mode==='offline'?reason:null,memory:{...session.memory},synthetic:true,provider:provider?.name||'none'};notify({type:'done',result});return result;
 }
-module.exports={agentTurn,cardsFor,remainingTools};
+module.exports={agentTurn,cardsFor,remainingTools,modelOutput};

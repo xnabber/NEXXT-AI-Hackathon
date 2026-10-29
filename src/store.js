@@ -11,6 +11,6 @@ class MemoryStore{
   if(cached&&cached.until>this.now())return structuredClone(cached.value);
   const value=compute();if(!value.error){if(this.cache.size>=500)this.cache.delete(this.cache.keys().next().value);this.cache.set(key,{until:this.now()+60000,value:structuredClone(value)});}return value;
  }
- record(session,type,data={}){const {tool,decision,mode,ms,tokens,inputTokens,outputTokens,cost,reason}=data;this.audit.push({at:new Date(this.now()).toISOString(),conversation:session.id,persona:session.customerId||'anonymous',type,...Object.fromEntries(Object.entries({tool,decision,mode,ms,tokens,inputTokens,outputTokens,cost,reason}).filter(([,v])=>v!==undefined))});if(this.audit.length>20000)this.audit.splice(0,1000);}
+ record(session,type,data={}){const {tool,agent,decision,mode,ms,tokens,inputTokens,outputTokens,cost,reason}=data;this.audit.push({at:new Date(this.now()).toISOString(),conversation:session.id,persona:session.customerId||'anonymous',type,...Object.fromEntries(Object.entries({tool,agent,decision,mode,ms,tokens,inputTokens,outputTokens,cost,reason}).filter(([,v])=>v!==undefined))});if(this.audit.length>20000)this.audit.splice(0,1000);}
 }
 module.exports={MemoryStore};
