@@ -1,6 +1,6 @@
 'use strict';
 
-const VERSION = 'specialist-supervisor-v2';
+const VERSION = 'specialist-supervisor-v3';
 const specialists = Object.freeze({
   budget: Object.freeze({
     tools: ['get_customer_profile', 'get_spending_summary', 'find_savings_capacity', 'what_if', 'set_risk_profile'],

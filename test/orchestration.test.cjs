@@ -195,3 +195,17 @@ test('concurrent customer journeys do not share specialist findings or tool cont
   assert.equal(two.cards.find(c => c.type === 'plan_proposal').productId, 'savings');
   assert.equal(store.plans.size, 0);
 });
+
+test('completed planning actions are removed and business ladder inputs stay one-off', async () => {
+  const f = fixture('elena'), requests = [];
+  const provider = scripted([budget, compare, step(call('simulate', { monthly: 0, years: 1, productId: 'business-ladder' })), step(call('propose_plan', { monthly: 0, productId: 'business-ladder' })), final]), complete = provider.complete;
+  provider.complete = async q => { requests.push(q); return complete(q); };
+  const r = await turn(f, 'Make a plan for our bakery surplus', { provider });
+  assert.equal(r.mode, 'agent');
+  assert.deepEqual(requests[3].tools.map(t => t.name), ['propose_plan']);
+  const ladder = requests[2].tools.find(t => t.name === 'propose_plan').inputSchema.oneOf.find(s => s.properties.productId.enum[0] === 'business-ladder');
+  assert.equal(ladder.properties.monthly.maximum, 0);
+  assert.equal(ladder.properties.monthly.minimum, 0);
+  assert.equal(r.cards.find(c => c.type === 'plan_proposal').monthly, 0);
+  assert.equal(f.store.plans.size, 0);
+});

@@ -35,6 +35,7 @@ class SpecialistCoordinator {
     if (!this.completed('compare_products')) return 'products';
     const capacity = this.board.findLast(e => e.tool === 'find_savings_capacity')?.output;
     const mayPropose = this.session.memory.riskComfort || capacity?.segment === 'business' || capacity?.microSaving > 0;
+    if (this.wantsProposal && !this.candidates().length) return 'coordinator';
     if (this.wantsSimulation && !this.completed('simulate')) return 'planning';
     if (this.wantsProposal && mayPropose && !this.completed('propose_plan')) return 'planning';
     return 'coordinator';
@@ -81,7 +82,7 @@ class SpecialistCoordinator {
     const comparison = this.board.findLast(e => e.tool === 'compare_products' && !e.output.error)?.output;
     const capacity = this.board.findLast(e => e.tool === 'find_savings_capacity' && !e.output.error)?.output;
     const limit = capacity?.ready ? capacity.safeMonthly : capacity?.microSaving || 0;
-    return (comparison?.products || []).filter(p => p.eligible).map(p => ({ productId: p.id, monthly: p.type === 'ladder' ? 0 : Math.min(this.session.memory.monthly, limit), monthlyLimit: p.type === 'ladder' ? 0 : limit, years: Math.max(1, Math.round(this.session.memory.horizonYears)) }));
+    return (comparison?.products || []).filter(p => p.eligible).map(p => ({ productId: p.id, monthly: p.type === 'ladder' ? 0 : Math.min(this.session.memory.monthly, limit), minimumMonthly: p.minimumMonthly, monthlyLimit: p.type === 'ladder' ? 0 : limit, years: Math.max(1, Math.round(this.session.memory.horizonYears)) })).filter(c => c.monthlyLimit >= c.minimumMonthly);
   }
 
   permitted(tool, input) {
@@ -90,7 +91,9 @@ class SpecialistCoordinator {
     if (role === 'budget') return tool === 'what_if' && Boolean(this.change) && !this.completed('what_if');
     if (role === 'coordinator' && this.session.customerId) return tool === 'handoff_to_adviser';
     if (tool === 'propose_plan' && !this.wantsProposal) return false;
+    if (role === 'planning' && this.completed(tool)) return false;
     if (role === 'planning' && input !== undefined && (!input?.productId || (this.wantsProposal && !this.candidates().some(c => c.productId === input.productId)))) return false;
+    if (role === 'planning' && this.wantsProposal && input !== undefined) { const candidate = this.candidates().find(c => c.productId === input.productId); if (!candidate || input.monthly < candidate.minimumMonthly || input.monthly > candidate.monthlyLimit) return false; }
     return true;
   }
 
@@ -99,9 +102,10 @@ class SpecialistCoordinator {
     const missing = [];
     if (this.change && !this.completed('what_if')) missing.push('what_if for the requested change');
     if (!this.completed('compare_products')) missing.push('compare_products');
-    if (this.wantsSimulation && !this.completed('simulate')) missing.push('simulate the selected eligible product');
+    if (this.wantsProposal && !this.candidates().length) return 'coordinator';
+    if (this.wantsSimulation && (!this.wantsProposal || this.candidates().length) && !this.completed('simulate')) missing.push('simulate the selected eligible product');
     const capacity = this.board.findLast(e => e.tool === 'find_savings_capacity')?.output;
-    if (this.wantsProposal && (this.session.memory.riskComfort || capacity?.segment === 'business' || capacity?.microSaving > 0) && !this.completed('propose_plan')) missing.push('propose_plan within capacity');
+    if (this.wantsProposal && this.candidates().length && (this.session.memory.riskComfort || capacity?.segment === 'business' || capacity?.microSaving > 0) && !this.completed('propose_plan')) missing.push('propose_plan within capacity');
     return missing;
   }
 
@@ -137,6 +141,8 @@ class SpecialistCoordinator {
           if (this.wantsProposal && candidates.length) {
             spec.inputSchema.properties.productId.enum = candidates.map(c => c.productId);
             spec.inputSchema.properties.monthly.maximum = Math.max(...candidates.map(c => c.monthlyLimit));
+            spec.inputSchema.properties.monthly.multipleOf = 50;
+            spec.inputSchema.oneOf = candidates.map(c => ({ properties: { productId: { enum: [c.productId] }, monthly: { minimum: c.minimumMonthly, maximum: c.monthlyLimit } } }));
           }
           return spec;
         });
