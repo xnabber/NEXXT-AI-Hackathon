@@ -43,16 +43,21 @@ A live educational question was successfully answered using the configured `us-w
 
 ## The journey
 
-| Route                     | Experience                                                                                                 |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `/`                       | Campaign landing, interactive inflation illustration, questions, four-stage overview.                      |
-| `/coach`                  | Three questions, free-text educational chat, quick replies, live contribution/horizon controls and charts. |
-| `/onboarding`             | New-customer or existing-customer demo choice.                                                             |
-| `/onboarding/new-account` | Two-step illustrated profile flow; no real identity verification.                                          |
-| `/onboarding/login`       | Demo customer access; no password or bank login collected.                                                 |
-| `/account/invest`         | Fictional funds with allocation, illustrative fees, risk, liquidity details, and horizon requirements.     |
-| `/account/plan`           | Review, illustrative contribution day, and explicit risk/demo acknowledgment.                              |
-| `/account/success`        | Simulated confirmation, downloadable plan, and educational next steps.                                     |
+The flow follows the concept deck: **see the ad → chat in the browser → create an account → continue in the app**, as one conversation that is never restarted.
+
+| Route                     | Step              | Experience                                                                                                                                                                                                                       |
+| ------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                       | 1. See the ad     | Campaign ad hero (“Stop situationshipping with your cash.”), inflation illustration, the four steps, and common worries.                                                                                                         |
+| `/coach`                  | 2. Chat           | Generic guidance with no account: topics (risk and return, funds and ETFs, fees, inflation, withdrawing money), free-text chat, an illustrative simulator. After the first answer, a consent card offers to continue in the app. |
+| `/onboarding`             | 3. Create account | Download the app (simulated), then create an account or log in. Shows whether the chat will carry over, and lets the person change that choice.                                                                                  |
+| `/onboarding/new-account` | 3. Create account | Two-step illustrated profile flow; no real identity verification.                                                                                                                                                                |
+| `/onboarding/login`       | 3. Create account | Demo customer access for existing clients; no password or bank login collected.                                                                                                                                                  |
+| `/account/coach`          | 4. In the app     | The same conversation continues (only with consent), with demo account data and three questions using the person’s own numbers.                                                                                                  |
+| `/account/invest`         | 4. In the app     | Fictional funds with allocation, illustrative fees, risk, liquidity details, and horizon requirements.                                                                                                                           |
+| `/account/plan`           | 4. In the app     | Review, illustrative contribution day, and explicit risk/demo acknowledgment.                                                                                                                                                    |
+| `/account/success`        | 4. In the app     | Simulated confirmation, downloadable plan, and educational next steps.                                                                                                                                                           |
+
+Without consent, the browser chat is discarded at sign-up and the in-app coach starts fresh. Account figures shown in the app are fictional demo data.
 
 The shared journey, conversation, and demo display name are saved in browser `localStorage`. They survive refresh and route changes, but do not sync across devices. Storage failures fall back to memory with a visible notice. **Reset demo** clears the saved journey. Changing an activated scenario requires reviewing and activating a new demo plan. Funds are examples, not suitability recommendations.
 

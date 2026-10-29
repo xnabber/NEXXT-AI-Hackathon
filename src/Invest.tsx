@@ -105,7 +105,7 @@ export default function Invest() {
     filter === "all" ? products : products.filter((p) => p.id === filter);
   return (
     <main className="container flow-page">
-      <Link className="back-link" to="/coach">
+      <Link className="back-link" to="/account/coach">
         <ChevronLeft size={16} /> Revisit my conversation
       </Link>
       <div className="invest-heading">
@@ -152,7 +152,7 @@ export default function Invest() {
             </strong>
           </span>
         </div>
-        <Link to="/coach">
+        <Link to="/account/coach">
           Adjust my scenario <ArrowUpRight size={15} />
         </Link>
       </div>
@@ -251,7 +251,7 @@ export default function Invest() {
                 )}
               </Button>
               {!available && (
-                <Link to="/coach" className="horizon-adjust">
+                <Link to="/account/coach" className="horizon-adjust">
                   Adjust your time horizon <ArrowUpRight size={12} />
                 </Link>
               )}
@@ -425,7 +425,7 @@ export function Plan() {
             <CircleHelp size={18} />
             <span>
               Something you’d like to understand?
-              <Link to="/coach">
+              <Link to="/account/coach">
                 Ask your coach <ArrowRight size={14} />
               </Link>
             </span>
@@ -569,7 +569,7 @@ export function Success() {
             Markets move. Revisit your horizon and risk comfort when your goals
             change.
           </p>
-          <Link className="text-link" to="/coach">
+          <Link className="text-link" to="/account/coach">
             Revisit the bigger picture <ArrowUpRight size={15} />
           </Link>
         </article>
@@ -583,7 +583,7 @@ export function Success() {
             Ask questions along the way. Understanding is a habit worth
             building, too.
           </p>
-          <Link className="text-link" to="/coach">
+          <Link className="text-link" to="/account/coach">
             Have a chat with your coach <ArrowUpRight size={15} />
           </Link>
         </article>

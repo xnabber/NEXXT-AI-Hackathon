@@ -19,8 +19,36 @@ async function noOverflow(page: Page) {
     ),
   ).toBe(true);
 }
-async function finishQuestions(page: Page, years = 5) {
+async function browserChat(page: Page) {
   await page.goto("/coach");
+  await expect(
+    page.getByText("Hi! I can explain how investing works."),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Risk and return" }).click();
+  await expect(page.locator(".message-bubble").last()).toContainText(
+    "8 minutes",
+  );
+}
+async function createAccount(page: Page, consent = true) {
+  await page
+    .getByRole("button", {
+      name: consent ? "I agree, continue" : "Continue without saving this chat",
+    })
+    .click();
+  await expect(page).toHaveURL(/\/onboarding$/);
+  await expect(
+    page.getByRole("link", { name: "Create my account" }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "App Store" }).click();
+  await page.getByRole("link", { name: "Create my account" }).click();
+  await page.getByLabel("Demo display name").fill("Sam");
+  await page.getByRole("button", { name: "Continue to review" }).click();
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Create my demo profile" }).click();
+  await expect(page).toHaveURL(/\/account\/coach$/);
+}
+async function finishQuestions(page: Page, years = 5) {
+  await page.goto("/account/coach");
   await page
     .getByRole("slider", { name: "Monthly investment" })
     .first()
@@ -44,7 +72,7 @@ async function demoLogin(page: Page) {
   await page.getByLabel("Demo display name").fill("Taylor");
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Continue as demo customer" }).click();
-  await expect(page).toHaveURL(/\/account\/invest$/);
+  await expect(page).toHaveURL(/\/account\/coach$/);
 }
 test("landing explains purchasing power and supports changing the horizon", async ({
   page,
@@ -62,15 +90,28 @@ test("landing explains purchasing power and supports changing the horizon", asyn
   await page.getByRole("link", { name: "See what it could do" }).click();
   await expect(page).toHaveURL(/\/coach$/);
 });
-test("complete new-customer journey preserves choices and activates only a demo plan", async ({
+test("complete journey: browser chat, consent, app account, own numbers, demo plan", async ({
   page,
 }) => {
   await guide(page);
-  await finishQuestions(page);
-  await page.getByRole("button", { name: "Could I lose money?" }).click();
-  await expect(page.locator(".message-bubble").last()).toContainText(
-    "cash buffer",
+  await browserChat(page);
+  await expect(
+    page.getByRole("heading", { name: "Continue in the Raiffeisen app" }),
+  ).toBeVisible();
+  await noOverflow(page);
+  await createAccount(page);
+  await expect(page.locator(".message.user").first()).toContainText(
+    "How do risk and return work?",
   );
+  await expect(page.locator(".chat-divider")).toContainText(
+    "Now in the Raiffeisen app",
+  );
+  await expect(page.locator(".own-data")).toContainText("6,200");
+  await finishQuestions(page);
+  await page.getByRole("button", { name: "Withdrawing money" }).click();
+  await expect(
+    page.locator(".message-list .message-bubble").last(),
+  ).toContainText("cash buffer");
   await page.reload();
   await expect(page.locator(".conversation-complete")).toContainText(
     "750 lei/month, 5-year scenario",
@@ -82,12 +123,6 @@ test("complete new-customer journey preserves choices and activates only a demo 
   await page
     .getByRole("link", { name: "Explore my options", exact: true })
     .click();
-  await noOverflow(page);
-  await page.getByRole("link", { name: /I’m new here/ }).click();
-  await page.getByLabel("Demo display name").fill("Sam");
-  await page.getByRole("button", { name: "Continue to review" }).click();
-  await page.getByRole("checkbox").check();
-  await page.getByRole("button", { name: "Create my demo profile" }).click();
   await expect(
     page.getByRole("heading", { name: "Find your kind of starting point." }),
   ).toBeVisible();
@@ -131,11 +166,23 @@ test("complete new-customer journey preserves choices and activates only a demo 
     page.getByRole("heading", { name: "Here’s to your future, Sam." }),
   ).toBeVisible();
 });
+test("declining consent starts a fresh conversation in the app", async ({
+  page,
+}) => {
+  await guide(page);
+  await browserChat(page);
+  await createAccount(page, false);
+  await expect(page.locator(".message.user")).toHaveCount(0);
+  await expect(page.locator(".message-bubble").first()).toContainText(
+    "starting fresh",
+  );
+});
 test("existing customer path and horizon requirements work", async ({
   page,
 }) => {
-  await finishQuestions(page, 3);
   await demoLogin(page);
+  await finishQuestions(page, 3);
+  await page.goto("/account/invest");
   await expect(
     page.getByRole("button", { name: "Requires a 5+ year horizon" }),
   ).toBeDisabled();
@@ -164,9 +211,9 @@ test("unavailable AI gives an honest answer, without losing the conversation", a
     .getByRole("textbox", { name: "Ask your investment coach" })
     .fill("Can I withdraw my money?");
   await page.getByRole("button", { name: "Send message" }).click();
-  await expect(page.locator(".message-bubble").last()).toContainText(
-    "3–5 business-day",
-  );
+  await expect(
+    page.locator(".message-list .message-bubble").last(),
+  ).toContainText("3–5 business-day");
   await expect(page.getByRole("status")).toContainText("educational guide");
   await expect(page.locator(".message.user")).toContainText(
     "Can I withdraw my money?",
@@ -185,9 +232,7 @@ test("private demo screens redirect and corrupted storage does not crash", async
   );
   await page.goto("/coach");
   await expect(
-    page.getByRole("heading", {
-      name: "How much could you comfortably set aside each month?",
-    }),
+    page.getByText("Hi! I can explain how investing works."),
   ).toBeVisible();
   await noOverflow(page);
 });
@@ -195,6 +240,7 @@ test("changing the scenario requires reviewing a new demo activation", async ({
   page,
 }) => {
   await demoLogin(page);
+  await page.goto("/account/invest");
   await page
     .getByRole("link", { name: "Review my Balanced Future plan" })
     .click();
@@ -232,7 +278,7 @@ test("core pages pass automated accessibility checks", async ({ page }) => {
     ).toEqual([]);
   }
   await demoLogin(page);
-  for (const route of ["/account/invest", "/account/plan"]) {
+  for (const route of ["/account/coach", "/account/invest", "/account/plan"]) {
     await page.goto(route);
     const result = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])

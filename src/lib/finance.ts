@@ -61,6 +61,13 @@ export const products: Product[] = [
   },
 ];
 export const INFLATION = 0.055;
+/* Fictional figures the in-app coach shows as "your own data" after sign-up. */
+export const demoAccount = {
+  currentBalance: 6200,
+  savingsBalance: 5000,
+  savingsRate: 0.005,
+  monthlyLeftover: 650,
+};
 export function purchasingPower(
   amount: number,
   years: number,

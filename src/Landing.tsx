@@ -178,36 +178,36 @@ export default function Landing() {
         <div className="container">
           <div className="center-heading">
             <div className="eyebrow">
-              <span /> FROM “WHAT IF” TO “I GET IT”
+              <span /> FROM AD TO ACCOUNT IN ONE CONVERSATION
             </div>
             <h2>A clearer path to your first investment.</h2>
-            <p>A conversation first. A decision when you’re ready.</p>
+            <p>Value before an account. A decision when you’re ready.</p>
           </div>
           <div className="journey-cards">
             {[
               {
                 icon: CircleHelp,
-                title: "A question worth asking",
-                text: "Discover what your idle cash could be doing.",
-                tag: "01 · DISCOVER",
+                title: "See the ad",
+                text: "A scroll-stopping ad on Instagram or TikTok.",
+                tag: "01 · SEE THE AD",
               },
               {
                 icon: MessageCircle,
-                title: "Let’s talk about you",
-                text: "Three quick questions. Clear, personal explanations.",
-                tag: "02 · EXPLORE",
+                title: "Chat in the browser",
+                text: "Tap the ad and talk to the AI coach. No account needed.",
+                tag: "02 · CHAT",
               },
               {
                 icon: Wallet,
-                title: "Pick up where you left off",
-                text: "Open a demo account or log in. Your choices come with you.",
-                tag: "03 · CONTINUE",
+                title: "Create account",
+                text: "Happy with the chat? Download the Raiffeisen app and register.",
+                tag: "03 · CREATE ACCOUNT",
               },
               {
                 icon: Sprout,
-                title: "Make a small beginning",
-                text: "Explore example funds and simulate your monthly plan.",
-                tag: "04 · YOUR INVESTMENT",
+                title: "Continue in the app",
+                text: "The same conversation picks up, now with your own data.",
+                tag: "04 · IN THE APP",
               },
             ].map(({ icon: Icon, title, text, tag }, i) => (
               <article className="journey-card" key={tag}>
@@ -242,19 +242,19 @@ export default function Landing() {
         <div className="concern-grid">
           {[
             {
-              icon: ShieldCheck,
-              title: "“What if I lose my money?”",
-              text: "It’s a fair question. Investment values can fall. We’ll explain the different risks, so you can explore with your eyes open.",
-            },
-            {
               icon: Wallet,
-              title: "“What if I need it back?”",
-              text: "Life happens. Access and withdrawal conditions depend on the product. We’ll help you understand what to look for.",
+              title: "“I don’t have enough spare money.”",
+              text: "You can start from 100 lei a month, after your everyday needs and emergency savings are covered.",
             },
             {
               icon: MessageCircle,
-              title: "“I don’t speak stock market.”",
-              text: "You don’t have to. Think everyday language, clear examples, and as many questions as you like.",
+              title: "“I don’t know how to start.”",
+              text: "Ask the coach anything, in plain words: risk, funds and ETFs, fees, inflation, withdrawing money.",
+            },
+            {
+              icon: ShieldCheck,
+              title: "“What if I lose my money?”",
+              text: "It’s a fair question. Investment values can fall. We’ll explain the risks, so you can explore with your eyes open.",
             },
           ].map(({ icon: Icon, title, text }) => (
             <article className="concern-card" key={title}>
