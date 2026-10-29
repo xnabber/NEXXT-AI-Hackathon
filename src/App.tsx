@@ -52,7 +52,7 @@ export default function App() {
   const { storageAvailable } = useJourney();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-    document.title = `${pathname === "/" ? "AI Investment Coach" : pathname === "/coach" ? "Your investment coach" : pathname.startsWith("/onboarding") ? "Your next step" : "Your demo investment"} · Raiffeisen Concept`;
+    document.title = `${pathname === "/" ? "AI Investment Coach" : pathname === "/coach" ? "Your investment coach" : pathname.startsWith("/onboarding") ? "Create your account" : pathname === "/account/coach" ? "Your coach, in the app" : "Your demo investment"} · Raiffeisen Concept`;
   }, [pathname]);
   return (
     <ErrorBoundary>
@@ -77,6 +77,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/coach" element={<Coach />} />
+            <Route path="/account/coach" element={<Coach inApp />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/onboarding/new-account" element={<AccountForm />} />
             <Route path="/onboarding/login" element={<AccountForm />} />

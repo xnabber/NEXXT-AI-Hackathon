@@ -8,6 +8,8 @@ export type Message = {
   role: "user" | "assistant";
   text: string;
   source?: "guided" | "bedrock";
+  /* Messages sent after the handoff live in the app; earlier ones came from the browser. */
+  channel?: "app";
 };
 export type Journey = {
   monthly: number;
@@ -21,6 +23,9 @@ export type Journey = {
   activated: boolean;
   activatedAt: string | null;
   planDay: number;
+  /* The person agreed to carry the browser chat into their new profile. */
+  chatConsent: boolean;
+  appInstalled: boolean;
 };
 export const initialJourney: Journey = {
   monthly: 500,
@@ -34,6 +39,8 @@ export const initialJourney: Journey = {
   activated: false,
   activatedAt: null,
   planDay: 1,
+  chatConsent: false,
+  appInstalled: false,
 };
 const STORAGE_KEY = "investment-coach-journey-v1";
 export function restoreJourney(value: unknown): Journey {
@@ -72,6 +79,10 @@ export function restoreJourney(value: unknown): Journey {
               ["user", "assistant"].includes(m.role) &&
               typeof m.id === "string",
           )
+          .map((m) => ({
+            ...m,
+            channel: m.channel === "app" ? ("app" as const) : undefined,
+          }))
           .slice(-40)
       : [],
     authenticated: v.authenticated === true,
@@ -87,6 +98,8 @@ export function restoreJourney(value: unknown): Journey {
       typeof v.planDay === "number" && [1, 15, 28].includes(v.planDay)
         ? v.planDay
         : 1,
+    chatConsent: v.chatConsent === true,
+    appInstalled: v.appInstalled === true,
     activatedAt:
       typeof v.activatedAt === "string" &&
       Number.isFinite(Date.parse(v.activatedAt))

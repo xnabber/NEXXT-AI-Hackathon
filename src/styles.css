@@ -5054,3 +5054,234 @@ h3 {
     font-size: 26px;
   }
 }
+
+/* Flow from the concept deck: browser chat, consent handoff, app steps, in-app coach */
+.topic-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 6px 0 4px 38px;
+}
+.handoff {
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+}
+.consent-card {
+  margin-left: 38px;
+  background: #f5f2e6;
+  border-radius: 22px;
+  padding: 20px 22px;
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+.consent-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #66655a;
+}
+.consent-card h3 {
+  font-size: 20px;
+}
+.consent-card p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.consent-card .button {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 800;
+}
+.consent-card .text-button {
+  justify-self: center;
+  color: #4f4f48;
+}
+.chat-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #55554e;
+}
+.chat-divider:before,
+.chat-divider:after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: #dcdcd6;
+}
+.own-data {
+  margin-left: 38px;
+  background: var(--night);
+  color: white;
+  border-radius: 22px;
+  padding: 18px 20px;
+}
+.own-data h3 {
+  color: white;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.own-data h3 svg {
+  color: var(--yellow);
+}
+.own-data h3 span {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--night-muted);
+  border: 1px solid var(--night-line);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.own-data dl {
+  margin: 14px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.own-data dt {
+  font-size: 11px;
+  color: var(--night-muted);
+}
+.own-data dd {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--yellow);
+}
+.own-data dd small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--night-muted);
+}
+.own-data p {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #d4d4cf;
+  line-height: 1.5;
+}
+.in-app-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--night);
+  color: white;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.in-app-pill svg {
+  color: var(--yellow);
+}
+.app-steps {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0 24px;
+  display: grid;
+  gap: 16px;
+}
+.app-step {
+  display: flex;
+  gap: 20px;
+  background: var(--night);
+  color: white;
+  border-radius: 24px;
+  padding: 26px 28px;
+}
+.app-step h2 {
+  color: white;
+  font-size: 22px;
+}
+.app-step p {
+  color: #c9c9c4;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+.app-step .fine-print {
+  color: var(--night-muted);
+  font-size: 12px;
+}
+.app-step.locked h2,
+.app-step.locked > .app-step-number {
+  opacity: 0.6;
+}
+.app-step-number {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--yellow);
+  min-width: 34px;
+}
+.app-step.done .app-step-number {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--ink);
+}
+.store-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 16px;
+}
+.app-step .button-dark {
+  background: white;
+  border-color: white;
+  color: var(--ink);
+}
+.app-step .button-dark:hover {
+  background: #e6e6e1;
+  border-color: #e6e6e1;
+}
+.app-step .text-link {
+  color: white;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.app-installed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+.saved-simulation > p + .text-button {
+  margin-top: 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 720px) {
+  .consent-card,
+  .own-data,
+  .topic-hint {
+    margin-left: 0;
+  }
+  .own-data dl {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .app-step {
+    padding: 22px 20px;
+    gap: 14px;
+  }
+}

@@ -29,7 +29,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
     </Link>
   );
 }
-const steps = ["Discover", "Explore", "Continue", "Your investment"];
+const steps = ["See the ad", "Chat", "Create account", "In the app"];
 export function Header() {
   const { pathname } = useLocation();
   const { state } = useJourney();
@@ -101,7 +101,9 @@ export function Header() {
         {menu && (
           <nav className="mobile-nav" aria-label="Mobile navigation">
             <Link to="/">Home</Link>
-            <Link to="/coach">Investment coach</Link>
+            <Link to={state.authenticated ? "/account/coach" : "/coach"}>
+              Investment coach
+            </Link>
             {state.authenticated && (
               <Link to="/account/invest">Explore funds</Link>
             )}

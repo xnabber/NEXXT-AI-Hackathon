@@ -3,53 +3,68 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
   Check,
   ChevronLeft,
+  Download,
   Fingerprint,
-  Landmark,
   LockKeyhole,
   Mail,
+  MessageCircle,
   ShieldCheck,
+  Smartphone,
   Sprout,
   UserRound,
 } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { Disclosure, PageIntro } from "./components/Layout";
 import { useJourney } from "./lib/journey";
-import { money } from "./lib/finance";
 
 export function JourneySummary() {
-  const { state } = useJourney();
+  const { state, update } = useJourney();
+  const saved = state.messages.length;
   return (
     <aside className="journey-summary">
       <span className="summary-sprout">
         <Sprout size={32} strokeWidth={1.5} />
       </span>
-      <div className="eyebrow">YOUR NEXT CHAPTER</div>
+      <div className="eyebrow">ONE CONVERSATION, NEVER RESTARTED</div>
       <h2>
-        A small habit.
-        <br />A future with
+        Your chat continues
         <br />
-        <span>more possibilities.</span>
+        <span>right after sign-up.</span>
       </h2>
       <div className="saved-simulation">
-        <span>
-          <Check size={15} /> YOUR SIMULATION IS SAVED
-        </span>
-        <div>
-          <strong>
-            {money(state.monthly)} <small>lei</small>
-          </strong>
-          <span>every month</span>
-        </div>
-        <div>
-          <strong>
-            {state.years} <small>years</small>
-          </strong>
-          <span>your time horizon</span>
-        </div>
-        <p>Your conversation and choices come with you.</p>
+        {state.chatConsent ? (
+          <>
+            <span>
+              <Check size={15} /> CHAT SAVED WITH YOUR CONSENT
+            </span>
+            <p>
+              {saved
+                ? `${saved} ${saved === 1 ? "message" : "messages"} will continue in the app.`
+                : "Your browser chat will continue in the app."}
+            </p>
+            <button
+              className="text-button"
+              onClick={() => update({ chatConsent: false })}
+            >
+              Don’t save my chat
+            </button>
+          </>
+        ) : (
+          <>
+            <span>
+              <MessageCircle size={15} /> CHAT NOT CARRIED OVER
+            </span>
+            <p>You’ll start a fresh conversation in the app.</p>
+            <button
+              className="text-button"
+              onClick={() => update({ chatConsent: true })}
+            >
+              I agree, save my chat to my new profile
+            </button>
+          </>
+        )}
       </div>
       <span className="summary-bottom">
         <ShieldCheck size={16} /> Demo only. No money will move.
@@ -58,54 +73,78 @@ export function JourneySummary() {
   );
 }
 export default function Onboarding() {
-  const { state } = useJourney();
-  if (state.authenticated) return <Navigate to="/account/invest" replace />;
+  const { state, update } = useJourney();
+  if (state.authenticated) return <Navigate to="/account/coach" replace />;
   return (
     <main className="container flow-page">
       <Link className="back-link" to="/coach">
-        <ChevronLeft size={16} /> Back to my coach
+        <ChevronLeft size={16} /> Back to my chat
       </Link>
       <div className="onboarding-grid">
         <div>
           <PageIntro
-            eyebrow="KEEP THE MOMENTUM"
-            title="Your next step, made simple."
+            eyebrow="CREATE YOUR ACCOUNT"
+            title="Download the app and create an account."
           >
-            You’ve done the exploring. Now choose how you’d like to continue.
-            We’ll keep everything right where you left it.
+            Happy with the chat? Two steps, then your coach picks up right where
+            you stopped.
           </PageIntro>
-          <div className="onboarding-options">
-            <Link to="/onboarding/new-account" className="onboarding-option">
-              <span className="option-icon">
-                <UserRound size={24} />
+          <ol className="app-steps">
+            <li className={state.appInstalled ? "app-step done" : "app-step"}>
+              <span className="app-step-number">
+                {state.appInstalled ? <Check size={22} /> : 1}
               </span>
               <div>
-                <h2>I’m new here</h2>
-                <p>Walk through a simple demo account opening.</p>
-                <span>
-                  Open a demo account <ArrowRight size={16} />
-                </span>
+                <h2>Download the app</h2>
+                <p>Get the Raiffeisen app on iOS or Android.</p>
+                {state.appInstalled ? (
+                  <span className="app-installed" role="status">
+                    <Smartphone size={15} /> App installed (simulated)
+                  </span>
+                ) : (
+                  <div className="store-buttons">
+                    {["App Store", "Google Play"].map((store) => (
+                      <Button
+                        key={store}
+                        variant="dark"
+                        size="small"
+                        onClick={() => update({ appInstalled: true })}
+                      >
+                        <Download size={15} /> {store}
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <ArrowUpRight size={22} />
-            </Link>
-            <Link to="/onboarding/login" className="onboarding-option">
-              <span className="option-icon neutral">
-                <Landmark size={24} />
-              </span>
+            </li>
+            <li className={state.appInstalled ? "app-step" : "app-step locked"}>
+              <span className="app-step-number">2</span>
               <div>
-                <h2>I’m already a customer</h2>
-                <p>Try the demo login and pick up your journey.</p>
-                <span>
-                  Continue with demo login <ArrowRight size={16} />
-                </span>
+                <h2>Create an account</h2>
+                <p>
+                  About 8 minutes in the app. Your chat continues right after.
+                </p>
+                {state.appInstalled ? (
+                  <div className="store-buttons">
+                    <Button asChild size="small">
+                      <Link to="/onboarding/new-account">
+                        Create my account <ArrowRight size={15} />
+                      </Link>
+                    </Button>
+                    <Link className="text-link" to="/onboarding/login">
+                      I’m already a Raiffeisen customer
+                    </Link>
+                  </div>
+                ) : (
+                  <p className="fine-print">Download the app first.</p>
+                )}
               </div>
-              <ArrowUpRight size={22} />
-            </Link>
-          </div>
+            </li>
+          </ol>
           <Disclosure short />
           <p className="fine-print">
-            No real banking credentials, identity documents, or personal details
-            are needed.
+            No real app is downloaded. No banking credentials, identity
+            documents, or personal details are needed.
           </p>
         </div>
         <JourneySummary />
@@ -122,7 +161,7 @@ export function AccountForm() {
   const [name, setName] = useState(state.name);
   const [acknowledged, setAcknowledged] = useState(false);
   const [error, setError] = useState("");
-  if (state.authenticated) return <Navigate to="/account/invest" replace />;
+  if (state.authenticated) return <Navigate to="/account/coach" replace />;
   function complete() {
     if (!name.trim()) {
       setError("Please add a demo display name. A nickname is fine.");
@@ -132,34 +171,41 @@ export function AccountForm() {
       setError("Please confirm that you understand this is a demo.");
       return;
     }
-    update({ authenticated: true, name: name.trim().slice(0, 30) });
-    navigate("/account/invest");
+    update((current) => ({
+      authenticated: true,
+      appInstalled: true,
+      name: name.trim().slice(0, 30),
+      /* The browser chat only carries over with consent. */
+      messages: current.chatConsent ? current.messages : [],
+      question: 0,
+    }));
+    navigate("/account/coach");
   }
   return (
     <main className="container flow-page">
       <Link className="back-link" to="/onboarding">
-        <ChevronLeft size={16} /> Choose another way
+        <ChevronLeft size={16} /> Back to the steps
       </Link>
       <div className="onboarding-grid">
         <section className="account-form">
           <PageIntro
             eyebrow={
               login
-                ? "WELCOME BACK, IN DEMO MODE"
-                : "LET’S MAKE A SMALL BEGINNING"
+                ? "RAIFFEISEN APP · LOG IN (DEMO)"
+                : "RAIFFEISEN APP · CREATE ACCOUNT (DEMO)"
             }
             title={
               login
                 ? "Good to see you again."
                 : step === 0
-                  ? "Meet your demo account."
+                  ? "Create your account."
                   : "One clear confirmation."
             }
           >
             {login
               ? "Continue as an example customer. Your real bank login stays out of this experience."
               : step === 0
-                ? "A short walkthrough of what getting started could feel like. Use a nickname; no personal information needed."
+                ? "In the real app this takes about 8 minutes. Here it’s a short walkthrough: use a nickname, no personal information needed."
                 : "In a real journey, a regulated onboarding process would verify your identity and complete required checks."}
           </PageIntro>
           {!login && (

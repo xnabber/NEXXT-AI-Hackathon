@@ -83,4 +83,20 @@ describe("saved journey resilience", () => {
         .messages,
     ).toEqual([]);
   });
+  it("restores chat consent, app install, and message channels strictly", () => {
+    const restored = restoreJourney({
+      chatConsent: true,
+      appInstalled: true,
+      messages: [
+        { id: "a", role: "user", text: "hi", channel: "app" },
+        { id: "b", role: "user", text: "hey", channel: "elsewhere" },
+      ],
+    });
+    expect(restored.chatConsent).toBe(true);
+    expect(restored.appInstalled).toBe(true);
+    expect(restored.messages.map((m) => m.channel)).toEqual(["app", undefined]);
+    const invalid = restoreJourney({ chatConsent: "yes", appInstalled: 1 });
+    expect(invalid.chatConsent).toBe(false);
+    expect(invalid.appInstalled).toBe(false);
+  });
 });
